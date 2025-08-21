@@ -1,0 +1,237 @@
+# 验证安装
+
+完成Pantheon-CLI安装后，让我们验证一切是否正常工作。
+
+## 基础验证
+
+### 1. 检查版本
+
+```bash
+pantheon --version
+```
+
+预期输出：
+```
+Pantheon-CLI version 1.0.0
+Python 3.11.0
+Platform: Darwin-23.0.0-x86_64
+```
+
+### 2. 查看帮助信息
+
+```bash
+pantheon --help
+```
+
+你应该看到完整的命令列表和选项说明。
+
+### 3. 运行诊断
+
+```bash
+pantheon doctor
+```
+
+这会检查：
+- ✅ Python版本
+- ✅ 必需依赖
+- ✅ 可选组件
+- ✅ 网络连接
+- ✅ 配置文件
+
+## 功能测试
+
+### 1. 创建测试项目
+
+```bash
+# 创建测试目录
+mkdir pantheon-test
+cd pantheon-test
+
+# 初始化项目
+pantheon init
+```
+
+### 2. 简单数据分析测试
+
+创建测试数据文件 `test.csv`：
+```csv
+name,age,score
+Alice,25,90
+Bob,30,85
+Charlie,35,95
+```
+
+执行分析：
+```bash
+pantheon analyze "读取test.csv并计算平均分"
+```
+
+### 3. 交互模式测试
+
+```bash
+pantheon interactive
+```
+
+在交互模式中输入：
+```
+> 生成10个随机数
+> 计算它们的均值和标准差
+> exit
+```
+
+### 4. 可视化测试
+
+```bash
+pantheon viz "创建一个简单的折线图，x轴为1到10，y轴为其平方"
+```
+
+## 性能基准测试
+
+运行性能测试套件：
+
+```bash
+pantheon benchmark
+```
+
+输出示例：
+```
+Running performance benchmarks...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Data Loading:      0.23s ✅ (Good)
+Processing Speed:  1.45s ✅ (Good)
+Memory Usage:      124MB ✅ (Good)
+API Response:      0.08s ✅ (Excellent)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Overall Score: 94/100 🎉
+```
+
+## 配置验证
+
+### 查看当前配置
+
+```bash
+pantheon config show
+```
+
+### 验证配置文件
+
+```bash
+pantheon config validate
+```
+
+### 测试数据源连接
+
+如果你配置了数据库：
+```bash
+pantheon test-connection
+```
+
+## 依赖检查
+
+### 列出所有依赖
+
+```bash
+pantheon deps list
+```
+
+### 检查缺失依赖
+
+```bash
+pantheon deps check
+```
+
+### 安装可选依赖
+
+```bash
+# 安装数据科学扩展包
+pantheon deps install data-science
+
+# 安装机器学习扩展包
+pantheon deps install ml-toolkit
+```
+
+## 故障排除检查清单
+
+使用以下清单排查问题：
+
+| 检查项 | 命令 | 预期结果 |
+|--------|------|----------|
+| PATH设置 | `which pantheon` | 显示安装路径 |
+| Python版本 | `python --version` | 3.8或更高 |
+| pip版本 | `pip --version` | 20.0或更高 |
+| 权限检查 | `ls -la ~/.pantheon` | 有读写权限 |
+| 网络连接 | `pantheon ping` | 连接成功 |
+| 日志文件 | `pantheon logs` | 无错误信息 |
+
+## 常见问题快速修复
+
+### 命令未找到
+
+```bash
+# Linux/macOS
+echo $PATH | grep pantheon
+export PATH="$HOME/.local/bin:$PATH"
+
+# Windows PowerShell
+$env:Path
+$env:Path += ";C:\Program Files\Pantheon-CLI\bin"
+```
+
+### 权限错误
+
+```bash
+# Linux/macOS
+chmod +x $(which pantheon)
+mkdir -p ~/.pantheon && chmod 755 ~/.pantheon
+
+# Windows (管理员PowerShell)
+icacls "$env:USERPROFILE\.pantheon" /grant "${env:USERNAME}:(F)"
+```
+
+### 模块导入错误
+
+```bash
+# 重新安装核心依赖
+pip install --force-reinstall pantheon-cli
+
+# 清理缓存
+pip cache purge
+```
+
+## 获取详细日志
+
+如遇到问题，启用详细日志：
+
+```bash
+# 设置日志级别
+export PANTHEON_LOG_LEVEL=DEBUG
+
+# 运行命令并保存日志
+pantheon --debug your-command 2>&1 | tee pantheon-debug.log
+```
+
+## 提交问题报告
+
+如果问题持续存在：
+
+1. 收集诊断信息：
+```bash
+pantheon diagnostic-report > report.txt
+```
+
+2. 访问 [GitHub Issues](https://github.com/pantheon-cli/pantheon-cli/issues)
+
+3. 提供以下信息：
+   - 操作系统和版本
+   - Python版本
+   - 完整错误信息
+   - 诊断报告内容
+
+## 验证成功！
+
+如果所有测试都通过，恭喜你！Pantheon-CLI已成功安装并准备就绪。
+
+下一步：
+- 📚 学习[基础命令](/basic-commands)
+- 🚀 探索[快速开始指南](/intro/getting-started)
+- 💡 查看[使用案例](https://pantheon-cli.io/examples)

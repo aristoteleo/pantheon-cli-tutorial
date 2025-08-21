@@ -1,0 +1,45 @@
+# 查看Pantheon-CLI版本
+$ pantheon --version
+> Pantheon-CLI version 1.0.0
+> Python 3.11.0
+> Platform: Darwin-23.0.0-x86_64
+
+---
+
+# 查看帮助信息
+$ pantheon --help
+> Usage: pantheon [OPTIONS] COMMAND [ARGS]...
+> 
+>   Pantheon-CLI - 数据科学的智能助手
+> 
+> Options:
+>   --version     显示版本信息
+>   --help        显示帮助信息
+>   --verbose     显示详细输出
+>   --quiet       静默模式
+> 
+> Commands:
+>   init          初始化新项目
+>   analyze       执行数据分析
+>   data          数据管理命令
+>   viz           创建可视化
+>   interactive   启动交互模式
+>   config        配置管理
+>   help          显示命令帮助
+
+---
+
+# 快速体验
+$ pantheon analyze "生成10个随机数并计算平均值"
+> 🎯 理解任务：生成10个随机数并计算平均值
+> 
+> 📊 执行分析...
+> 生成的随机数: [23, 67, 45, 89, 12, 34, 78, 56, 91, 38]
+> 
+> 📈 计算结果：
+> - 平均值: 53.3
+> - 标准差: 26.7
+> - 最小值: 12
+> - 最大值: 91
+> 
+> ✅ 分析完成！

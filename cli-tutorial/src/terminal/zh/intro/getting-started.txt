@@ -1,0 +1,90 @@
+# 初始化你的第一个项目
+$ pantheon init my-first-project
+> 🚀 初始化 Pantheon 项目...
+> 
+> 📁 创建项目结构：
+>   ✅ 创建项目目录: my-first-project/
+>   ✅ 创建数据目录: my-first-project/data/
+>   ✅ 创建脚本目录: my-first-project/scripts/
+>   ✅ 创建输出目录: my-first-project/output/
+>   ✅ 生成配置文件: my-first-project/pantheon.yaml
+>   ✅ 创建示例数据: my-first-project/data/sample.csv
+> 
+> 🎉 项目初始化成功！
+> 
+> 下一步操作：
+>   cd my-first-project
+>   pantheon interactive
+
+---
+
+$ cd my-first-project
+$ ls -la
+> total 16
+> drwxr-xr-x   6 user  staff   192 Mar 15 14:30 .
+> drwxr-xr-x  12 user  staff   384 Mar 15 14:30 ..
+> drwxr-xr-x   3 user  staff    96 Mar 15 14:30 data
+> drwxr-xr-x   2 user  staff    64 Mar 15 14:30 scripts
+> drwxr-xr-x   2 user  staff    64 Mar 15 14:30 output
+> -rw-r--r--   1 user  staff   458 Mar 15 14:30 pantheon.yaml
+
+---
+
+# 查看配置文件
+$ cat pantheon.yaml
+> # Pantheon 项目配置
+> project:
+>   name: my-first-project
+>   version: 1.0.0
+>   created: 2024-03-15
+> 
+> settings:
+>   language: zh
+>   auto_save: true
+>   cache: true
+>   
+> data:
+>   default_encoding: utf-8
+>   missing_values: ['NA', 'null', '']
+>   
+> output:
+>   format: html
+>   charts_dpi: 300
+>   report_template: default
+
+---
+
+# 启动交互模式
+$ pantheon interactive
+> 
+> ╔══════════════════════════════════════════════╗
+> ║         Pantheon CLI Interactive Mode         ║
+> ║                                              ║
+> ║  项目: my-first-project                      ║
+> ║  版本: 1.0.0                                 ║
+> ║  时间: 2024-03-15 14:31:05                  ║
+> ╚══════════════════════════════════════════════╝
+> 
+> 提示：
+>   • 输入 'help' 查看可用命令
+>   • 输入 'exit' 退出交互模式
+>   • 支持自然语言和Python代码
+> 
+> pantheon> help
+> 
+> 可用命令：
+>   load <file>     - 加载数据文件
+>   save <file>     - 保存数据
+>   analyze <task>  - 执行分析任务
+>   plot <type>     - 创建图表
+>   describe        - 显示数据描述统计
+>   clean           - 清理数据
+>   export          - 导出报告
+>   clear           - 清屏
+>   exit            - 退出
+> 
+> 示例：
+>   pantheon> load data/sales.csv
+>   pantheon> 显示前10行数据
+>   pantheon> df.info()
+>   pantheon> 创建销售趋势图

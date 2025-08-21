@@ -17,21 +17,25 @@ import Terminal from '../components/Terminal.vue'
 <style scoped>
 .tutorial-view {
   display: flex;
-  height: 100vh;
+  height: 100%;
   width: 100%;
 }
 
 .content-section {
   flex: 1;
   background: var(--main-bg);
-  overflow-y: auto;
   border-right: 1px solid var(--border-color);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
 .terminal-section {
   flex: 1;
   background: var(--main-bg);
   padding: 20px;
+  height: 100%;
   overflow: hidden;
 }
 </style>

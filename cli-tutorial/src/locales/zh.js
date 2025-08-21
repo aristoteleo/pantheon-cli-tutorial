@@ -39,7 +39,12 @@ export default {
     input: '输入命令',
     output: '输出结果',
     placeholder: '在此输入命令...',
-    clear: '清空'
+    clear: '清空',
+    demo: '命令演示',
+    copy: '复制命令',
+    reset: '重置',
+    welcome: '欢迎使用 Pantheon-CLI 教程终端演示',
+    hint: '点击左侧菜单查看对应的命令示例'
   },
   content: {
     introduction: {

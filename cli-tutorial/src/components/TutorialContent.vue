@@ -14,32 +14,39 @@ const route = useRoute()
 const { locale } = useI18n()
 const markdownContent = ref('')
 
+// 导入所有markdown文件
+const markdownModules = import.meta.glob('../content/**/*.md', { 
+  eager: false,
+  query: '?raw',
+  import: 'default'
+})
+
 const contentMap = {
-  '/': 'introduction',
+  '/': 'intro/introduction',
   '/intro/what-is-cli': 'intro/what-is-cli',
   '/intro/why-cli': 'intro/why-cli',
   '/intro/getting-started': 'intro/getting-started',
   
-  '/installation': 'installation',
+  '/installation': 'installation/installation',
   '/installation/requirements': 'installation/requirements',
   '/installation/windows': 'installation/windows',
   '/installation/macos': 'installation/macos',
   '/installation/linux': 'installation/linux',
   '/installation/verify': 'installation/verify',
   
-  '/basic-commands': 'basic-commands',
+  '/basic-commands': 'basic/basic-commands',
   '/basic/navigation': 'basic/navigation',
   '/basic/file-operations': 'basic/file-operations',
   '/basic/text-editing': 'basic/text-editing',
   '/basic/permissions': 'basic/permissions',
   
-  '/advanced-usage': 'advanced-usage',
+  '/advanced-usage': 'advanced/advanced-usage',
   '/advanced/scripting': 'advanced/scripting',
   '/advanced/pipes': 'advanced/pipes',
   '/advanced/regex': 'advanced/regex',
   '/advanced/automation': 'advanced/automation',
   
-  '/troubleshooting': 'troubleshooting',
+  '/troubleshooting': 'trouble/troubleshooting',
   '/trouble/common-errors': 'trouble/common-errors',
   '/trouble/debugging': 'trouble/debugging',
   '/trouble/faq': 'trouble/faq'
@@ -50,11 +57,27 @@ const loadMarkdown = async () => {
   const lang = locale.value
   
   try {
-    const module = await import(`../content/${lang}/${key}.md?raw`)
-    markdownContent.value = module.default
+    const modulePath = `../content/${lang}/${key}.md`
+    const loader = markdownModules[modulePath]
+    
+    if (loader) {
+      const content = await loader()
+      markdownContent.value = content
+    } else {
+      // 如果找不到对应语言的文件，尝试加载默认语言
+      const fallbackPath = `../content/zh/${key}.md`
+      const fallbackLoader = markdownModules[fallbackPath]
+      
+      if (fallbackLoader) {
+        const content = await fallbackLoader()
+        markdownContent.value = content
+      } else {
+        throw new Error(`File not found: ${modulePath}`)
+      }
+    }
   } catch (error) {
     console.error('Failed to load markdown:', error)
-    markdownContent.value = `# 内容加载失败\n\n无法加载 ${key} 的内容。`
+    markdownContent.value = `# 内容加载失败\n\n无法加载 ${key} 的内容。\n\n错误信息：${error.message}`
   }
 }
 
@@ -92,12 +115,34 @@ function escapeHtml(text) {
   width: 100%;
   height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.tutorial-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tutorial-content::-webkit-scrollbar-track {
+  background: var(--main-bg);
+  border-radius: 4px;
+}
+
+.tutorial-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.tutorial-content::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }
 
 .markdown-body {
   color: var(--text-primary);
   line-height: 1.8;
   text-align: left;
+  max-width: 100%;
+  padding-bottom: 50px;
 }
 
 :deep(.markdown-body h1) {

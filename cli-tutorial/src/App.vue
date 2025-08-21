@@ -23,7 +23,8 @@ import Sidebar from './components/Sidebar.vue'
   flex: 1;
   margin-left: 240px;
   display: flex;
-  overflow: hidden;
   width: calc(100% - 240px);
+  height: 100vh;
+  position: relative;
 }
 </style>
