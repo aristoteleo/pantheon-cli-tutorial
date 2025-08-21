@@ -1,4 +1,4 @@
-# 模型配置命令演示
+# 模型配置Example
 
 ## 1. 配置 OpenAI API 密钥
 $ /api-key openai sk-xxxxxxxxxxxxxxxxxxxx

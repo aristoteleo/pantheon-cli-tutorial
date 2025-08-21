@@ -182,11 +182,16 @@ const isActive = (path) => {
   if (route.path === path) return true
   
   // 如果是子页面，检查是否属于当前父级路径
-  if (path === '/' && route.path.startsWith('/intro/')) return true
+  // 注意：只有在当前路径确实是子页面时才激活父级
+  if (path === '/' && route.path === '/') return true
+  if (path.startsWith('/intro/') && route.path === path) return true
   if (path === '/installation' && route.path.startsWith('/installation/')) return true
+  if (path.startsWith('/basic/') && route.path === path) return true
   if (path === '/basic-commands' && route.path.startsWith('/basic/')) return true
+  if (path.startsWith('/advanced/') && route.path === path) return true
   if (path === '/advanced-usage' && route.path.startsWith('/advanced/')) return true
   if (path.startsWith('/cases/') && route.path === path) return true
+  if (path.startsWith('/trouble/') && route.path === path) return true
   if (path === '/troubleshooting' && route.path.startsWith('/trouble/')) return true
   
   return false

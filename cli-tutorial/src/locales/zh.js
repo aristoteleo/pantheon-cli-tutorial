@@ -55,20 +55,20 @@ export default {
     output: '输出结果',
     placeholder: '在此输入命令...',
     clear: '清空',
-    demo: '命令演示',
+    demo: 'Example',
     copy: '复制命令',
     reset: '重置',
     welcome: '欢迎使用 Pantheon-CLI 教程终端演示',
     hint: '点击左侧菜单查看对应的命令示例'
   },
   video: {
-    demo: '真实案例演示',
-    realCase: '基于真实Pantheon CLI会话记录',
-    comingSoon: '真实案例视频演示',
-    description: '展示完整的Pantheon CLI分析流程',
-    realAnalysis: '真实分析场景',
-    naturalLanguage: '自然语言交互',
-    stepByStep: '分步骤演示'
+    demo: 'True case',
+    realCase: 'Base on true CLI conversation',
+    comingSoon: 'True case',
+    description: '',
+    realAnalysis: '',
+    naturalLanguage: 'Natural language',
+    stepByStep: 'Step by step'
   },
   content: {
     introduction: {
