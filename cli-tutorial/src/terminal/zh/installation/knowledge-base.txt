@@ -1,0 +1,121 @@
+## 1. 构建默认RAG数据库
+$ python -m pantheon.toolsets.utils.rag build pantheon_cli/cli/rag_system_config.yaml tmp/pantheon_cli_tools_rag
+🔄 开始构建RAG数据库...
+📥 下载文档源: kallisto-bustools
+📥 下载文档源: star  
+📥 下载文档源: cellranger
+📥 下载文档源: seurat
+📥 下载文档源: scanpy
+📥 下载文档源: bulk-rna-seq
+
+🧠 使用embedding模型: text-embedding-3-large
+⚙️  分块大小: 4000 字符, 重叠: 200 字符
+
+┌─ RAG构建进度 ─────────────────────────────────┐
+│ [████████████████████████████████] 100%   │
+│                                           │
+│ 处理文档: 1,247 个                        │
+│ 生成向量: 8,934 个                        │
+│ 数据库大小: 156.7 MB                      │
+│ 耗时: 8分12秒                             │
+└───────────────────────────────────────────┘
+✅ RAG数据库构建完成: tmp/pantheon_cli_tools_rag/pantheon-cli-tools
+
+## 2. 启动带RAG功能的Pantheon-CLI
+$ pantheon-cli
+🚀 启动 Pantheon-CLI...
+🔍 检测到RAG数据库: tmp/pantheon_cli_tools_rag/pantheon-cli-tools
+✅ RAG功能已启用 - 支持生物信息学工具查询
+
+欢迎使用Pantheon-CLI！您可以直接询问生物信息学相关问题。
+
+## 3. 在CLI中测试RAG功能
+> 如何使用kallisto和bustools处理单细胞RNA-seq数据？
+🔍 正在RAG数据库中搜索相关信息...
+
+📚 找到相关文档: kallisto-bustools官方文档
+💡 kallisto | bustools是单细胞RNA-seq数据预处理的工作流程，包括：
+1. 将reads与细胞关联
+2. 根据UMI合并reads  
+3. 生成基因表达矩阵
+
+具体流程：
+```bash
+# 1. 构建索引
+kallisto index -i index.idx transcriptome.fa
+
+# 2. 定量分析
+kallisto bus -i index.idx -o output/ reads_1.fastq reads_2.fastq
+
+# 3. 生成矩阵
+bustools correct -w whitelist.txt output/output.bus | \
+bustools sort -o output/output.sort.bus
+```
+
+## 4. 检查RAG数据库状态
+$ ls -la tmp/pantheon_cli_tools_rag/pantheon-cli-tools
+total 320M
+drwxr-xr-x  5 user  staff   160B Mar 15 14:30 .
+drwxr-xr-x  3 user  staff    96B Mar 15 14:29 ..
+-rw-r--r--  1 user  staff   156M Mar 15 14:30 index.faiss
+-rw-r--r--  1 user  staff   2.3M Mar 15 14:30 metadata.json
+-rw-r--r--  1 user  staff   1.2K Mar 15 14:30 config.yaml
+
+## 5. 使用自定义RAG配置
+$ cat > custom_rag.yaml << EOF
+my-lab-protocols:
+  description: 实验室协议文档库
+  type: vector_db
+  parameters:
+    embedding_model: text-embedding-3-large
+    chunk_size: 4000
+    chunk_overlap: 200
+  items:
+    lab-protocols:
+      type: local_directory
+      path: ./lab_docs
+      description: "实验室标准操作流程"
+EOF
+
+$ python -m pantheon.toolsets.utils.rag build custom_rag.yaml ./my_custom_rag
+🔄 构建自定义RAG数据库...
+📁 扫描本地目录: ./lab_docs
+✅ 自定义RAG数据库构建完成
+
+$ pantheon-cli --rag_db ./my_custom_rag/my-lab-protocols
+🚀 启动 Pantheon-CLI...
+✅ 使用自定义RAG数据库: ./my_custom_rag/my-lab-protocols
+
+## 6. 禁用RAG功能启动
+$ pantheon-cli --disable_rag
+🚀 启动 Pantheon-CLI...
+⚠️  RAG功能已禁用 - 不会使用知识库检索
+
+## 7. Python API测试RAG查询
+$ python -c "
+from pantheon.toolsets.utils.rag.vectordb import VectorDB
+import asyncio
+
+async def test_rag():
+    db = VectorDB('tmp/pantheon_cli_tools_rag/pantheon-cli-tools')
+    results = await db.query('单细胞RNA-seq质控', top_k=3)
+    for r in results:
+        print(f'相关度: {r.score:.3f}')
+        print(f'来源: {r.metadata[\"source\"]}')
+        print(f'内容: {r.content[:100]}...')
+        print('---')
+
+asyncio.run(test_rag())
+"
+相关度: 0.876
+来源: scanpy
+内容: Quality control metrics are essential for single-cell RNA-seq analysis...
+---
+相关度: 0.823
+来源: seurat  
+内容: We start by reading in the data and creating a Seurat object with QC metrics...
+---
+相关度: 0.791
+来源: cellranger
+内容: Cell Ranger provides automated quality control filtering...
+---

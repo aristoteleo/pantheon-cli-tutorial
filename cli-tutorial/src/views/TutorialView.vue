@@ -22,7 +22,9 @@ import Terminal from '../components/Terminal.vue'
 }
 
 .content-section {
-  flex: 1;
+  flex: 1 1 50%;
+  min-width: 50%;
+  max-width: 50%;
   background: var(--main-bg);
   border-right: 1px solid var(--border-color);
   height: 100%;
@@ -32,7 +34,9 @@ import Terminal from '../components/Terminal.vue'
 }
 
 .terminal-section {
-  flex: 1;
+  flex: 1 1 50%;
+  min-width: 50%;
+  max-width: 50%;
   background: var(--main-bg);
   padding: 20px;
   height: 100%;

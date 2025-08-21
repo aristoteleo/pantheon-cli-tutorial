@@ -105,7 +105,7 @@ A: 避免使用sudo，使用虚拟环境或用户级安装：
 ```bash
 pip install --user pantheon-cli
 ```
-
+/Users/fernandozeng/Desktop/analysis/pantheon-cli-tutorial/cli-tutorial/public/pantheon
 ## 下一步
 
 安装完成后，你可以：

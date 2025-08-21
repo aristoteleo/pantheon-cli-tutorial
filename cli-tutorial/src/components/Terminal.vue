@@ -28,8 +28,8 @@
           
           <div class="output-block" v-if="block.type === 'output'">
             <pre class="output-text" :class="{ 'long-box': isLongBox(block.content) }">{{ truncateIfNeeded(block.content) }}</pre>
-            <div v-if="isLongBox(block.content) && block.content.length > 2000" class="truncate-hint">
-              <span class="hint-text">内容过长已截断，显示前2000字符</span>
+            <div v-if="block.content.split('\n').length > 30" class="truncate-hint">
+              <span class="hint-text">内容过长已截断显示</span>
             </div>
           </div>
           
@@ -44,21 +44,10 @@
             <span>加载中...</span>
           </div>
           <div v-else>
-            <div class="ascii-logo">
-              ╔═══════════════════════════════╗
-              ║   PANTHEON CLI TUTORIAL       ║
-              ╚═══════════════════════════════╝
-            </div>
-            <p>{{ t('terminal.welcome') }}</p>
-            <p class="hint">{{ t('terminal.hint') }}</p>
+            <pre class="default-content">{{ defaultContent }}</pre>
           </div>
         </div>
         
-        <!-- 光标闪烁效果 -->
-        <div class="cursor-line" v-if="showCursor && parsedContent.length > 0">
-          <span class="prompt">$</span>
-          <span class="cursor">▊</span>
-        </div>
       </div>
     </div>
   </div>
@@ -77,10 +66,32 @@ const themeStore = useThemeStore()
 const { isDark } = storeToRefs(themeStore)
 
 const terminalContent = ref(null)
-const showCursor = ref(true)
 const loading = ref(false)
 const rawContent = ref('')
 const parsedContent = ref([])
+
+// 默认显示内容
+const defaultContent = ref(`$ pantheon-cli
+Aristotle © 2025
+   ___  ___   _  __________ __________  _  __
+  / _ \\/ _ | / |/ /_  __/ // / __/ __ \\/ |/ /
+ / ___/ __ |/    / / / / _  / _// /_/ /    / 
+/_/  /_/ |_/_/|_/ /_/ /_//_/___/\\____/_/|_/  
+
+We're not just building another CLI tool.
+We're redefining how scientists interact with data in the AI era.
+Pantheon-CLI is a research project, use with caution.
+
+MODEL
+  • gpt-5-mini
+HELP
+  • /exit    to quit
+  • /help    for commands
+  • /model   for available models
+  • /api-key for API keys     
+CONTROL
+Use ↑/↓ arrows for command history
+Enter your message (press Enter twice to finish)`)
 
 // 导入所有terminal txt文件
 const terminalFiles = import.meta.glob('../terminal/**/*.txt', {
@@ -97,16 +108,17 @@ const contentMap = {
   
   '/installation': 'installation/installation',
   '/installation/requirements': 'installation/requirements',
-  '/installation/windows': 'installation/windows',
-  '/installation/macos': 'installation/macos',
-  '/installation/linux': 'installation/linux',
+  '/installation/detail/windows': 'installation/windows',
+  '/installation/detail/macos': 'installation/macos',
+  '/installation/detail/linux': 'installation/linux',
+  '/installation/model-config': 'installation/model-config',
+  '/installation/knowledge-base': 'installation/knowledge-base',
   '/installation/verify': 'installation/verify',
   
   '/basic-commands': 'basic/basic-commands',
-  '/basic/navigation': 'basic/navigation',
-  '/basic/file-operations': 'basic/file-operations',
-  '/basic/text-editing': 'basic/text-editing',
-  '/basic/permissions': 'basic/permissions',
+  '/basic/system-commands': 'basic/system-commands',
+  '/basic/dialog-commands': 'basic/dialog-commands',
+  '/basic/program-commands': 'basic/program-commands',
   
   '/advanced-usage': 'advanced/advanced-usage',
   '/advanced/scripting': 'advanced/scripting',
@@ -125,64 +137,67 @@ const parseTerminalContent = (content) => {
   if (!content) return []
   
   const blocks = []
-  const sections = content.split('---').map(s => s.trim()).filter(s => s)
+  const lines = content.split('\n')
+  let i = 0
   
-  sections.forEach(section => {
-    const lines = section.split('\n')
-    let currentBlock = null
-    let outputLines = []
+  while (i < lines.length) {
+    const line = lines[i].trim()
     
-    lines.forEach(line => {
-      // 注释行
-      if (line.startsWith('# ')) {
-        if (outputLines.length > 0 && currentBlock) {
-          currentBlock.content = outputLines.join('\n')
-          blocks.push(currentBlock)
-          outputLines = []
-          currentBlock = null
-        }
-        blocks.push({
-          type: 'comment',
-          content: line.substring(2)
-        })
-      }
-      // 命令行
-      else if (line.startsWith('$ ') || line.startsWith('pantheon> ')) {
-        if (outputLines.length > 0 && currentBlock) {
-          currentBlock.content = outputLines.join('\n')
-          blocks.push(currentBlock)
-          outputLines = []
-        }
-        
-        const prompt = line.includes('pantheon>') ? 'pantheon>' : '$'
-        const command = line.substring(prompt.length + 1).trim()
-        
-        currentBlock = {
-          type: 'command',
-          prompt: prompt,
-          content: command
-        }
-        blocks.push(currentBlock)
-        currentBlock = null
-      }
-      // 输出行
-      else if (line.startsWith('> ')) {
-        outputLines.push(line.substring(2))
-      }
-      // 空行或其他内容作为输出
-      else if (line.trim() || outputLines.length > 0) {
-        outputLines.push(line)
-      }
-    })
-    
-    // 处理最后的输出
-    if (outputLines.length > 0) {
-      blocks.push({
-        type: 'output',
-        content: outputLines.join('\n')
-      })
+    // 跳过空行
+    if (!line) {
+      i++
+      continue
     }
-  })
+    
+    // 注释行 (## 开头)
+    if (line.startsWith('## ')) {
+      blocks.push({
+        type: 'comment',
+        content: line.substring(3)
+      })
+      i++
+    }
+    // 命令行 ($ 开头)
+    else if (line.startsWith('$ ')) {
+      const command = line.substring(2).trim()
+      blocks.push({
+        type: 'command',
+        prompt: '$',
+        content: command
+      })
+      i++
+      
+      // 收集这个命令后面的输出，直到遇到下一个命令或注释
+      const outputLines = []
+      while (i < lines.length) {
+        const nextLine = lines[i]
+        
+        // 如果遇到新的命令或注释，停止收集输出
+        if (nextLine.trim().startsWith('$ ') || nextLine.trim().startsWith('## ')) {
+          break
+        }
+        
+        // 收集输出行
+        outputLines.push(nextLine)
+        i++
+      }
+      
+      // 如果有输出内容，创建output block
+      if (outputLines.length > 0) {
+        const outputContent = outputLines.join('\n').trim()
+        if (outputContent) {
+          blocks.push({
+            type: 'output',
+            content: outputContent
+          })
+        }
+      }
+    }
+    else {
+      // 其他行作为输出处理
+      i++
+    }
+  }
   
   return blocks
 }
@@ -272,28 +287,40 @@ const resetDemo = () => {
   }
 }
 
-// 检测是否是长框内容
+// 检测是否是长框内容或包含大量行
 const isLongBox = (content) => {
   if (!content) return false
-  return content.includes('╭') || content.includes('│') || content.includes('╰')
+  
+  // 检测是否有很多行内容
+  const lineCount = content.split('\n').length
+  const hasLotsOfLines = lineCount > 30
+  
+  // 检测是否内容很长
+  const hasLongContent = content.length > 1000
+  
+  // 只有在内容确实很长的情况下才返回true
+  return hasLotsOfLines || hasLongContent
 }
 
 // 截断过长内容
 const truncateIfNeeded = (content) => {
   if (!content) return ''
   
-  // 对于长框内容，如果超过2000字符则截断
-  if (isLongBox(content) && content.length > 2000) {
-    return content.substring(0, 2000) + '\n...'
+  const lines = content.split('\n')
+  
+  // 优先按行数判断，如果行数合理就不截断
+  if (lines.length <= 30) {
+    return content
+  }
+  
+  // 如果行数过多，截断行数
+  if (lines.length > 30) {
+    return lines.slice(0, 30).join('\n') + '\n[... 输出过长，已截断显示 ...]'
   }
   
   return content
 }
 
-// 光标闪烁
-setInterval(() => {
-  showCursor.value = !showCursor.value
-}, 500)
 </script>
 
 <style scoped>
@@ -530,25 +557,9 @@ setInterval(() => {
   opacity: 0.8;
 }
 
-.cursor-line {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.cursor {
-  animation: blink 1s infinite;
-  color: var(--accent-color);
-}
-
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
-}
 
 /* 暗色主题 */
-:root[data-theme="dark"] {
+:root.dark {
   --terminal-bg: #0a0a0a;
   --header-bg: #18181b;
   --tab-bg: #27272a;
@@ -557,11 +568,48 @@ setInterval(() => {
 }
 
 /* 亮色主题 */
-:root[data-theme="light"] {
+:root:not(.dark) {
   --terminal-bg: #ffffff;
   --header-bg: #f4f4f5;
   --tab-bg: #e4e4e7;
   --comment-bg: rgba(107, 114, 128, 0.05);
   --comment-color: #6b7280;
+}
+
+/* 白天主题：黑色字体 */
+:root:not(.dark) .command-text {
+  color: #000000 !important;
+}
+
+:root:not(.dark) .output-text {
+  color: #1f2937 !important;
+}
+
+:root:not(.dark) .prompt {
+  color: var(--accent-color) !important;
+}
+
+/* 夜晚主题：白色字体 */
+:root.dark .command-text {
+  color: #ffffff !important;
+}
+
+:root.dark .output-text {
+  color: #e5e7eb !important;
+}
+
+:root.dark .prompt {
+  color: var(--accent-color) !important;
+}
+
+.default-content {
+  color: var(--text-primary);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  padding: 10px;
 }
 </style>

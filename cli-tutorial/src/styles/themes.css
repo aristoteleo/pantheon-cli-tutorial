@@ -8,13 +8,13 @@
   --code-block-bg: #1f2937;
   --button-bg: #ffffff;
   --hover-bg: #f3f4f6;
-  --active-bg: #f0fdf4;
+  --active-bg: #faf5ff;
   --submenu-bg: #fafafa;
   --border-color: #e5e7eb;
   --text-primary: #111827;
   --text-secondary: #6b7280;
-  --accent-color: #10b981;
-  --code-color: #059669;
+  --accent-color: #8b5cf6;
+  --code-color: #7c3aed;
   --code-block-color: #e5e7eb;
 }
 
@@ -28,13 +28,13 @@
   --code-block-bg: #18181b;
   --button-bg: #27272a;
   --hover-bg: #27272a;
-  --active-bg: #1a2e1a;
+  --active-bg: #2e1a2e;
   --submenu-bg: #0f0f12;
   --border-color: #3f3f46;
   --text-primary: #fafafa;
   --text-secondary: #a1a1aa;
-  --accent-color: #22c55e;
-  --code-color: #34d399;
+  --accent-color: #a855f7;
+  --code-color: #c084fc;
   --code-block-color: #d4d4d8;
 }
 

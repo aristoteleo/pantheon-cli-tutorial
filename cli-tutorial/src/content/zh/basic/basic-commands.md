@@ -1,27 +1,18 @@
-# 基础命令
+# 命令概述
 
-## 常用命令列表
+在本章中，我们将简单介绍一下Pantheon-CLI中的命令系统，Pantheon-CLI一共有三种不同的命令，
+包括：`系统命令`，`对话命令`，`程序命令`
 
-### help - 查看帮助
+## 1. 系统命令
 
-```bash
-my-cli help
-```
+顾名思义，系统命令为Pantheon-CLI自带的命令，这些命令一般使用`\`开头，例如`\help`,`\model`，这些都是系统命令，我们可以使用`\help`查看几乎所有的系统命令
 
-### init - 初始化项目
+## 2. 对话命令
 
-```bash
-my-cli init <project-name>
-```
+对话命令，即大语言模型会自动分析用户的输入，判断需要执行的工具，目前Pantheon-CLI有着超过60+的工具，这些工具涵盖文件加载`read_file`，网页获取`web_fetch`,网页搜索`web_search`,运行python`run_python_code`等。
 
-### list - 列出所有项目
+如果在对话中提及工具函数的名字，Pantheon-CLI会直接调用对应的工具函数进行分析。
 
-```bash
-my-cli list
-```
+## 3. 程序命令
 
-### run - 运行项目
-
-```bash
-my-cli run <project-name>
-```
+由于Pantheon-CLI是一个混合语言编程的终端，相较于其他的CLI而言，Pantheon-CLI支持直接运行`python`, `R`和`Julia`代码，并且这些变量会保存在程序运行过程中。可以被`对话命令`使用，同时`对话命令`的变量也可以直接被使用。二者是一个相互的过程。

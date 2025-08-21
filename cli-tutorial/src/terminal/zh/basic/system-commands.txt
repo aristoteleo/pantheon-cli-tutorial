@@ -1,0 +1,89 @@
+$ \help
+-- BASIC ------------------------------------------------------------
+
+/help     - Show this help
+/status   - Session info
+/history  - Show command history
+/tokens   - Token usage analysis
+/save     - Save conversation with terminal output to markdown
+/clear    - Clear screen
+/restart  - Restart Python interpreter (clear all state)
+/bio      - Bioinformatics analysis helper ??
+!<cmd>    - Execute bash command directly (no LLM)
+%<code>   - Execute Python code directly (no LLM)
+><code>   - Execute R code directly (no LLM)
+/exit     - Exit cleanly
+Ctrl+C    - Cancel current operation
+Ctrl+C x2 - Force exit (within 2 seconds)
+
+-- MODEL & API ------------------------------------------------------
+
+/model list               - List available models
+/model current            - Show current model
+/model <id>               - Switch to model
+/api-key list             - Show API key status
+/api-key <provider> <key> - Set API key
+
+-- NAVIGATION -------------------------------------------------------
+
+🧬 - Browse command history
+
+$ /bio
+
+?? Bio Analysis Tools
+/bio list - List all available bio analysis tools
+/bio info <tool> - Get information about a specific tool
+/bio help  - Get help for bio tools
+/bio <tool> <command> - Run tool-specific commands
+
+Examples:
+  /bio list                      # Show all available tools
+  /bio atac init                 # Initialize ATAC-seq project
+  /bio atac upstream ./data      # Run upstream ATAC analysis
+  /bio scatac init               # Initialize scATAC-seq project
+  /bio scatac upstream ./data    # Run cellranger-atac analysis
+  /bio scrna init                # Initialize scRNA-seq project
+  /bio scrna analysis ./data    # Load and analyze scRNA-seq data
+  /bio rna init                 # Initialize RNA-seq project
+  /bio rna upstream ./data      # Run RNA-seq upstream analysis
+  /bio spatial init              # Initialize spatial project
+  /bio spatial run_spatial_workflow <workflow_type> # Run spatial workflow
+  /bio dock init                # Initialize molecular docking project
+  /bio dock run_dock            # Interactive molecular docking workflow
+  /bio dock run ./data          # Run batch molecular docking on folder
+  /bio GeneAgent TP53,BRCA1,EGFR # Gene set analysis with AI
+
+$ /status 
+-- STATUS 
+
+• Agent:     general_bot
+• Model:     gpt-5-mini
+• Messages:  3
+• Duration:  96m
+• History:   109 commands
+
+-- TOKENS 
+
+  • Total:   164
+  • Input:   6
+  • Output:  158
+  • Avg/msg: 54
+
+Input: readline (with history)
+
+$ /history
+-- HISTORY
+
+Command History (110 commands)
+...
+101. generate 10 random numbers
+102. analyze data
+103. /api-key
+104. /model
+105. /help
+106. \bio
+107. /bio
+108. /help
+109. /status
+110. /history
+

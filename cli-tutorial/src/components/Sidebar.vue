@@ -1,5 +1,13 @@
 <template>
   <aside class="sidebar">
+    <!-- Logo区域 -->
+    <div class="logo-section">
+      <div class="logo-icon">
+        <img src="/pantheon.png" alt="Pantheon-CLI" />
+      </div>
+      <div class="logo-text">Pantheon-CLI</div>
+    </div>
+    
     <nav class="nav-menu">
       <div v-for="item in menuItems" :key="item.key" class="menu-section">
         <div 
@@ -21,13 +29,39 @@
           
           <transition name="submenu">
             <div v-show="expandedSections[item.key]" class="submenu">
-              <div
-                v-for="child in item.children"
-                :key="child.path"
-                @click="navigateTo(child.path)"
-                :class="['nav-subitem', { active: isActive(child.path) }]"
-              >
-                <span class="subitem-text">{{ t(`nav.${child.key}`) }}</span>
+              <div v-for="child in item.children" :key="child.key || child.path">
+                <!-- 如果子项有路径，直接显示为二级菜单 -->
+                <div
+                  v-if="child.path"
+                  @click="navigateTo(child.path)"
+                  :class="['nav-subitem', { active: isActive(child.path) }]"
+                >
+                  <span class="subitem-text">{{ t(`nav.${child.key}`) }}</span>
+                </div>
+                
+                <!-- 如果子项有子菜单，显示为可展开的三级菜单 -->
+                <div v-else-if="child.children" class="submenu-group">
+                  <div 
+                    @click="toggleSection(child.key)"
+                    :class="['nav-subitem', 'nav-subparent', { expanded: expandedSections[child.key] }]"
+                  >
+                    <span class="subitem-text">{{ t(`nav.${child.key}`) }}</span>
+                    <span class="nav-arrow small">{{ expandedSections[child.key] ? '▼' : '▶' }}</span>
+                  </div>
+                  
+                  <transition name="submenu">
+                    <div v-show="expandedSections[child.key]" class="sub-submenu">
+                      <div
+                        v-for="grandchild in child.children"
+                        :key="grandchild.path"
+                        @click="navigateTo(grandchild.path)"
+                        :class="['nav-sub-subitem', { active: isActive(grandchild.path) }]"
+                      >
+                        <span class="sub-subitem-text">{{ t(`nav.${grandchild.key}`) }}</span>
+                      </div>
+                    </div>
+                  </transition>
+                </div>
               </div>
             </div>
           </transition>
@@ -102,6 +136,10 @@ const updateExpandedSections = () => {
     expandedSections['introduction'] = true
   } else if (currentPath === '/installation' || currentPath.startsWith('/installation/')) {
     expandedSections['installation'] = true
+    // 如果是详细安装指南的子页面，也展开详细安装指南
+    if (currentPath.startsWith('/installation/detail/')) {
+      expandedSections['installDetail'] = true
+    }
   } else if (currentPath === '/basic-commands' || currentPath.startsWith('/basic/')) {
     expandedSections['basicCommands'] = true
   } else if (currentPath === '/advanced-usage' || currentPath.startsWith('/advanced/')) {
@@ -159,6 +197,44 @@ const changeLocale = () => {
   left: 0;
   top: 0;
   overflow-y: auto;
+}
+
+.logo-section {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--sidebar-bg);
+}
+
+.logo-icon {
+  width: 60px;
+  height: 42px;
+  color: var(--accent-color);
+  margin-bottom: 12px;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.logo-icon:hover {
+  transform: scale(1.05);
+  color: var(--accent-color);
+  filter: brightness(1.1);
+}
+
+.logo-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo-text {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: 0.5px;
+  font-family: 'Georgia', serif;
 }
 
 .nav-menu {
@@ -229,7 +305,7 @@ const changeLocale = () => {
 }
 
 .nav-subitem {
-  padding: 8px 20px 8px 50px;
+  padding: 8px 45px 8px 50px;
   color: var(--text-secondary);
   cursor: pointer;
   font-size: 13px;
@@ -251,6 +327,8 @@ const changeLocale = () => {
 .subitem-text {
   display: block;
   text-align: left;
+  flex: 1;
+  padding-right: 25px;
 }
 
 .submenu-enter-active,
@@ -269,6 +347,53 @@ const changeLocale = () => {
 .submenu-leave-from {
   opacity: 1;
   max-height: 500px;
+}
+
+.nav-subparent {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-arrow.small {
+  font-size: 8px;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.sub-submenu {
+  background: var(--submenu-bg);
+  margin-left: 10px;
+  border-left: 2px solid var(--border-color);
+}
+
+.nav-sub-subitem {
+  padding: 6px 15px 6px 70px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.nav-sub-subitem:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.nav-sub-subitem.active {
+  background: var(--active-bg);
+  color: var(--accent-color);
+  border-left-color: var(--accent-color);
+}
+
+.sub-subitem-text {
+  display: block;
+  font-size: 12px;
+  text-align: left;
 }
 
 .sidebar-footer {

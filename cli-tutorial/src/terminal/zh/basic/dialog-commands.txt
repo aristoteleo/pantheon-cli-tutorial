@@ -1,0 +1,228 @@
+## 自然语言数据加载演示
+$ 加载单细胞数据文件data.h5ad
+正在加载数据文件...
+✓ 成功加载 data.h5ad
+数据信息:
+- 细胞数: 3,000
+- 基因数: 20,000
+- 变量: obs, var, X, raw
+数据已存储在变量 'adata' 中
+
+$ 这个数据需要做质控吗？
+分析数据质量...
+
+建议进行以下质控步骤:
+1. 过滤低质量细胞 (线粒体基因比例 > 20%)
+2. 过滤低表达基因 (在 < 3 个细胞中表达)
+3. 去除离群细胞
+
+是否执行自动质控? (推荐)
+
+$ 是的，请执行自动质控
+正在执行质控流程...
+
+步骤1: 计算质控指标
+- 计算线粒体基因比例
+- 计算细胞总基因数
+- 计算细胞总转录本数
+
+步骤2: 过滤细胞
+- 过滤前: 3,000 细胞
+- 过滤后: 2,847 细胞 (移除153个低质量细胞)
+
+步骤3: 过滤基因  
+- 过滤前: 20,000 基因
+- 过滤后: 18,456 基因 (移除1,544个低表达基因)
+
+✓ 质控完成! 数据质量显著改善
+
+## 分析任务对话演示
+$ 现在对细胞进行聚类分析
+开始细胞聚类分析...
+
+步骤1: 数据归一化和缩放
+- 使用 scanpy.pp.normalize_total()
+- 对数转换: scanpy.pp.log1p()
+- 高变基因检测: 找到 2,000 个高变基因
+
+步骤2: 降维分析
+- 主成分分析 (PCA): 保留前50个主成分
+- 邻域图构建: 使用前15个主成分
+
+步骤3: 聚类
+- Leiden聚类算法
+- 分辨率: 0.5 (自动优化)
+- 发现 8 个细胞群
+
+步骤4: UMAP可视化
+正在生成UMAP图...
+✓ 聚类分析完成! 已保存结果到 adata.obs['leiden']
+
+$ 这8个细胞群分别是什么类型的细胞？
+正在进行细胞类型注释...
+
+使用 marker genes 分析:
+- Cluster 0: T细胞 (CD3D+, CD3E+)
+- Cluster 1: B细胞 (CD79A+, MS4A1+) 
+- Cluster 2: NK细胞 (GNLY+, NKG7+)
+- Cluster 3: 单核细胞 (CD14+, LYZ+)
+- Cluster 4: 树突细胞 (FCER1A+, CST3+)
+- Cluster 5: 巨噬细胞 (CD68+, CD163+)
+- Cluster 6: 中性粒细胞 (S100A8+, S100A9+)
+- Cluster 7: 血小板 (PPBP+, PF4+)
+
+细胞类型注释已添加到 adata.obs['cell_type']
+
+## 可视化请求演示
+$ 画个散点图显示不同细胞类型在UMAP上的分布
+正在生成细胞类型UMAP图...
+
+```python
+import scanpy as sc
+import matplotlib.pyplot as plt
+
+sc.pl.umap(adata, color='cell_type', 
+          legend_loc='on data', 
+          legend_fontsize=10,
+          frameon=False,
+          save='_cell_types.pdf')
+```
+
+✓ 图已生成并保存为: figures/umap_cell_types.pdf
+
+$ 再画个小提琴图比较不同细胞类型的基因表达
+您想查看哪些基因的表达？我推荐一些marker genes:
+- CD3D (T细胞标记)
+- CD79A (B细胞标记) 
+- CD14 (单核细胞标记)
+- CD68 (巨噬细胞标记)
+
+$ 就用这几个基因
+正在生成小提琴图...
+
+```python
+sc.pl.violin(adata, ['CD3D', 'CD79A', 'CD14', 'CD68'],
+             groupby='cell_type',
+             rotation=45,
+             save='_marker_genes.pdf')
+```
+
+✓ 小提琴图已生成: figures/violin_marker_genes.pdf
+
+## 解释和帮助对话演示
+$ 解释一下这个聚类结果的生物学意义
+这个聚类结果展现了典型的外周血单核细胞(PBMC)的细胞组成:
+
+生物学解释:
+1. **T细胞群体** (Cluster 0): 
+   - 占比最大的免疫细胞群体
+   - 负责适应性免疫反应
+   - CD3D高表达是T细胞的经典标记
+
+2. **B细胞群体** (Cluster 1):
+   - 负责抗体产生
+   - CD79A是B细胞受体复合物的关键组分
+
+3. **单核/巨噬细胞系** (Clusters 3,5):
+   - 先天免疫的重要组成
+   - CD14+ 单核细胞可分化为巨噬细胞
+   - CD68+ 巨噬细胞具有吞噬功能
+
+4. **NK细胞** (Cluster 2):
+   - 天然杀伤细胞
+   - 对病毒感染和肿瘤细胞有快速杀伤作用
+
+这个细胞组成反映了健康的免疫系统状态，各免疫细胞亚群比例正常。
+
+$ 推荐下一步分析方法
+基于当前的聚类结果，我推荐以下分析:
+
+1. **差异表达基因分析**:
+   - 找到每个细胞类型的特异性marker基因
+   - 可以用于细胞类型的进一步验证
+
+2. **功能富集分析**:
+   - 对每个细胞群的marker基因做GO/KEGG分析
+   - 了解不同细胞类型的功能特征
+
+3. **细胞通讯分析**:
+   - 使用CellPhoneDB或类似工具
+   - 分析不同细胞类型间的相互作用
+
+4. **轨迹分析** (如果有时间序列):
+   - 如果是分化过程，可以用Monocle/PAGA
+   - 重构细胞发育轨迹
+
+您想进行哪种分析？
+
+$ 我们先做差异表达基因分析
+开始差异表达分析...
+
+使用 Wilcoxon rank-sum test:
+```python
+sc.tl.rank_genes_groups(adata, 'cell_type', method='wilcoxon')
+sc.pl.rank_genes_groups(adata, n_genes=5, sharey=False, save='_deg_top5.pdf')
+```
+
+结果摘要:
+- T细胞 top DEGs: CD3D, CD3E, IL7R, CD2, TRAC
+- B细胞 top DEGs: CD79A, MS4A1, CD79B, BANK1, IGHM  
+- NK细胞 top DEGs: GNLY, NKG7, GZMB, FGFBP2, SPON2
+- 单核细胞 top DEGs: CD14, LYZ, S100A9, VCAN, S100A8
+
+✓ 差异表达分析完成! 结果保存在 adata.uns['rank_genes_groups']
+
+## 多语言混合演示
+$ Let me switch to English for the next analysis
+No problem! I can understand both Chinese and English seamlessly.
+
+$ 现在我想用R语言的Seurat重新分析这个数据
+切换到R语言环境进行Seurat分析...
+
+```r
+# 转换数据格式到Seurat对象
+library(Seurat)
+library(reticulate)
+
+# 从Python导入数据
+adata <- py$adata
+seurat_obj <- CreateSeuratObject(
+  counts = t(adata$X), 
+  meta.data = adata$obs
+)
+
+# Seurat标准流程
+seurat_obj <- NormalizeData(seurat_obj)
+seurat_obj <- FindVariableFeatures(seurat_obj)
+seurat_obj <- ScaleData(seurat_obj)
+seurat_obj <- RunPCA(seurat_obj)
+seurat_obj <- FindNeighbors(seurat_obj)
+seurat_obj <- FindClusters(seurat_obj, resolution = 0.5)
+seurat_obj <- RunUMAP(seurat_obj, dims = 1:10)
+```
+
+✓ Seurat分析完成! 数据对象可在Python和R间共享
+
+$ 用Julia做一下高性能的基因共表达分析怎么样？
+切换到Julia环境...
+
+```julia
+using PyCall, Statistics, LinearAlgebra
+
+# 导入Python数据
+@pyimport scanpy as sc
+adata = py"adata"
+
+# 高性能基因共表达矩阵计算
+X = Matrix(adata.X')  # 转置: 基因×细胞
+cor_matrix = cor(X)
+
+# 识别高度相关的基因模块
+using Clustering
+clusters = hclust(1 .- cor_matrix)
+```
+
+Julia的高性能计算优势在大规模数据上更明显，
+当前数据集较小，两种方法差异不大。
+
+✓ 多语言分析展示了Pantheon-CLI的混合编程能力!

@@ -16,12 +16,18 @@ navigation:
         key: installOverview
       - path: /installation/requirements
         key: installRequirements
-      - path: /installation/windows
-        key: installWindows
-      - path: /installation/macos
-        key: installMacos
-      - path: /installation/linux
-        key: installLinux
+      - key: installDetail
+        children:
+          - path: /installation/detail/windows
+            key: installWindows
+          - path: /installation/detail/macos
+            key: installMacos
+          - path: /installation/detail/linux
+            key: installLinux
+      - path: /installation/model-config
+        key: installModelConfig
+      - path: /installation/knowledge-base
+        key: installKnowledgeBase
       - path: /installation/verify
         key: installVerify
   
@@ -29,14 +35,12 @@ navigation:
     children:
       - path: /basic-commands
         key: basicOverview
-      - path: /basic/navigation
-        key: basicNavigation
-      - path: /basic/file-operations
-        key: basicFileOps
-      - path: /basic/text-editing
-        key: basicTextEdit
-      - path: /basic/permissions
-        key: basicPermissions
+      - path: /basic/system-commands
+        key: basicSystemCommands
+      - path: /basic/dialog-commands
+        key: basicDialogCommands
+      - path: /basic/program-commands
+        key: basicProgramCommands
   
   - key: advancedUsage
     children:

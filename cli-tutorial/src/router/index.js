@@ -22,6 +22,11 @@ const routes = [
     component: () => import('../views/TutorialView.vue')
   },
   {
+    path: '/installation/detail/:topic',
+    name: 'installDetailTopic',
+    component: () => import('../views/TutorialView.vue')
+  },
+  {
     path: '/basic-commands',
     name: 'basicCommands',
     component: () => import('../views/TutorialView.vue')

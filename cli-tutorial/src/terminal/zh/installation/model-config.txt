@@ -1,0 +1,31 @@
+# 模型配置命令演示
+
+## 1. 配置 OpenAI API 密钥
+$ /api-key openai sk-xxxxxxxxxxxxxxxxxxxx
+✓ OpenAI API密钥已成功配置
+
+## 2. 配置 Claude API 密钥  
+$ /api-key anthropic sk-ant-xxxxxxxxxxxxxxxxxxxx
+✓ Claude API密钥已成功配置
+
+## 3. 设置默认模型
+$ /model gpt-5
+✓ 默认模型已设置为: gpt-5
+
+## 4. 查看当前配置
+$ /api-key
+🔑 API Key Management:
+
+✅ OpenAI: openai (saved + environment)
+❌ Anthropic: anthropic
+❌ Google: google
+❌ DeepSeek: deepseek
+❌ Qwen (Alibaba): qwen
+❌ Kimi (Moonshot): moonshot
+❌ Grok (xAI): grok
+
+
+## 5. 环境变量配置示例
+$ export OPENAI_API_KEY="your_api_key_here"
+$ export CLAUDE_API_KEY="your_claude_key_here" 
+
