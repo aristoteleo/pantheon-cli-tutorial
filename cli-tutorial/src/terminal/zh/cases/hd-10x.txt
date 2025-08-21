@@ -1,0 +1,140 @@
+# 10x HD Visium细胞分割真实案例
+
+# 空间转录组数据初始化
+clear_all_todos({})
+show_todos({'show_completed': True})
+
+# 提供空间数据路径和图像信息
+data: data_HD_sp/binned_outputs/square_002um, image: Visium_HD_Human_Colon_Cancer_tissue_image.btf
+
+# 查看数据目录结构
+ls({'path': 'data_HD_sp/binned_outputs/square_002um', 'show_hidden': False, 'show_details': True, 'recursive': False})
+
+# 发现的文件结构：
+# filtered_feature_bc_matrix/ (directory)
+# raw_feature_bc_matrix/ (directory) 
+# spatial/ (directory)
+# filtered_feature_bc_matrix.h5 (460412254 bytes)
+# raw_feature_bc_matrix.h5 (506917643 bytes)
+# raw_probe_bc_matrix.h5 (532808403 bytes)
+
+# 查看spatial目录内容
+ls({'path': 'data_HD_sp/binned_outputs/square_002um/spatial', 'show_hidden': False, 'show_details': True, 'recursive': False})
+
+# spatial目录包含：
+# aligned_fiducials.jpg (3090458 bytes)
+# aligned_tissue_image.jpg (1556093 bytes)
+# cytassist_image.tiff (26635869 bytes)
+# detected_tissue_image.jpg (913309 bytes)
+# scalefactors_json.json (296 bytes)
+# tissue_hires_image.png (30476167 bytes)
+# tissue_lowres_image.png (290777 bytes)
+# tissue_positions.parquet (169709102 bytes)
+
+# 查看图像文件信息
+ls({'path': '.', 'show_hidden': False, 'show_details': True, 'recursive': False})
+
+# 查看BTF图像文件
+check if Visium_HD_Human_Colon_Cancer_tissue_image.btf exists
+
+# 设置空间分析参数
+set image_path to Visium_HD_Human_Colon_Cancer_tissue_image.btf and data_path to data_HD_sp/binned_outputs/square_002um
+
+# 创建空间任务
+add_task({'task_description': 'Load Visium HD data and segment cells'})
+
+# 开始加载空间转录组数据
+run_r_code loading spatial data from data_HD_sp/binned_outputs/square_002um
+
+# 启动R环境进行HD分析
+R
+
+library(Seurat)
+library(SeuratData)
+library(ggplot2)
+library(patchwork)
+
+# 加载10x Visium HD数据
+spatial_data <- Load10X_Spatial(
+  data.dir = "data_HD_sp/binned_outputs/square_002um/",
+  filename = "filtered_feature_bc_matrix.h5",
+  assay = "Spatial",
+  slice = "slice1",
+  filter.matrix = TRUE,
+  to.upper = FALSE,
+  image = Seurat::Read10X_Image(
+    image.dir = "data_HD_sp/binned_outputs/square_002um/spatial/",
+    image.name = "tissue_hires_image.png"
+  )
+)
+
+# 查看数据概况
+print(spatial_data)
+print(paste("Spots数量:", ncol(spatial_data)))
+print(paste("基因数量:", nrow(spatial_data)))
+
+# 计算质控指标
+spatial_data[["percent.mt"]] <- PercentageFeatureSet(spatial_data, pattern = "^MT-")
+
+# 空间质控可视化
+SpatialFeaturePlot(spatial_data, features = "nCount_Spatial") + 
+  theme(legend.position = "right")
+
+# 可视化线粒体基因表达
+SpatialFeaturePlot(spatial_data, features = "percent.mt") + 
+  theme(legend.position = "right")
+
+# HD细胞分割预处理
+spatial_data <- subset(spatial_data, 
+                      subset = nFeature_Spatial > 200 & 
+                              nFeature_Spatial < 8000 & 
+                              percent.mt < 30)
+
+# SCTransform标准化（适用于HD数据）
+spatial_data <- SCTransform(spatial_data, assay = "Spatial", verbose = FALSE)
+
+# PCA分析
+spatial_data <- RunPCA(spatial_data, assay = "SCT", verbose = FALSE)
+
+# 高分辨率聚类（HD特异性）
+spatial_data <- FindNeighbors(spatial_data, reduction = "pca", dims = 1:30)
+spatial_data <- FindClusters(spatial_data, verbose = FALSE, resolution = 1.2)
+
+# UMAP降维
+spatial_data <- RunUMAP(spatial_data, reduction = "pca", dims = 1:30)
+
+# HD空间聚类可视化
+SpatialDimPlot(spatial_data, 
+               group.by = "seurat_clusters", 
+               label = TRUE, 
+               label.size = 3,
+               pt.size.factor = 0.8)
+
+# 高分辨率特征基因识别
+cluster_markers <- FindAllMarkers(spatial_data, 
+                                 only.pos = TRUE, 
+                                 min.pct = 0.1, 
+                                 logfc.threshold = 0.25)
+
+# 可视化top标记基因的空间表达
+top_markers <- cluster_markers %>% 
+  group_by(cluster) %>% 
+  top_n(n = 1, wt = avg_log2FC)
+
+SpatialFeaturePlot(spatial_data, 
+                   features = head(top_markers$gene, 6), 
+                   ncol = 3, 
+                   alpha = c(0.1, 1))
+
+# HD细胞分割结果保存
+saveRDS(spatial_data, file = "visium_hd_segmented.rds")
+
+# 生成分割报告
+cat("10x HD Visium细胞分割分析完成\n")
+cat("识别到", length(unique(spatial_data$seurat_clusters)), "个空间细胞群体\n")
+cat("处理了", ncol(spatial_data), "个高分辨率空间spots\n")
+
+# 标记任务完成
+mark_task_done({'task_description': 'Load Visium HD data and segment cells'})
+
+\bio

@@ -20,16 +20,8 @@ const route = useRoute()
 // 定义不需要显示终端的页面
 const noTerminalPages = [
   '/advanced/tool-details',
-  '/cases/social-behavior',
-  '/cases/customs-finance',
-  '/cases/scrna-complex',
-  '/cases/scllm',
-  '/cases/hd-10x',
-  '/cases/atac-upstream',
-  '/cases/rna-upstream',
-  '/cases/mixed-python-r',
-  '/cases/molecular-docking',
-  '/cases/seurat-llm-annotation'
+  '/release-notes',
+  '/join-us'
 ]
 
 const shouldShowTerminal = computed(() => {

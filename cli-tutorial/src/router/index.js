@@ -47,6 +47,11 @@ const routes = [
     component: () => import('../views/TutorialView.vue')
   },
   {
+    path: '/cases/:topic',
+    name: 'caseTopic',
+    component: () => import('../views/TutorialView.vue')
+  },
+  {
     path: '/troubleshooting',
     name: 'troubleshooting',
     component: () => import('../views/TutorialView.vue')
@@ -54,6 +59,16 @@ const routes = [
   {
     path: '/trouble/:topic',
     name: 'troubleTopic',
+    component: () => import('../views/TutorialView.vue')
+  },
+  {
+    path: '/release-notes',
+    name: 'releaseNotes',
+    component: () => import('../views/TutorialView.vue')
+  },
+  {
+    path: '/join-us',
+    name: 'joinUs',
     component: () => import('../views/TutorialView.vue')
   }
 ]

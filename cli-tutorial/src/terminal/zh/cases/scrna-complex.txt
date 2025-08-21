@@ -1,0 +1,241 @@
+# 复杂单细胞RNA-seq注释终端演示
+
+# 启动R环境进行复杂单细胞分析
+R
+
+# 1. 加载必要的包
+library(Seurat)
+library(SingleCellExperiment)
+library(scater)
+library(scran)
+library(SingleR)
+library(celldex)
+library(pheatmap)
+library(ggplot2)
+library(dplyr)
+library(patchwork)
+
+# 2. 数据加载和质控
+# 加载10x数据
+data.dir <- "path/to/complex_scRNA_data/"
+expression.matrix <- Read10X(data.dir = data.dir)
+
+# 创建Seurat对象
+seurat.obj <- CreateSeuratObject(
+  counts = expression.matrix,
+  project = "ComplexTissue",
+  min.cells = 3,
+  min.features = 200
+)
+
+print(paste("初始细胞数:", ncol(seurat.obj)))
+print(paste("检测基因数:", nrow(seurat.obj)))
+
+# 3. 高级质控指标计算
+# 线粒体基因
+seurat.obj[["percent.mt"]] <- PercentageFeatureSet(seurat.obj, pattern = "^MT-")
+
+# 核糖体基因
+seurat.obj[["percent.rb"]] <- PercentageFeatureSet(seurat.obj, pattern = "^RP[SL]")
+
+# 血红蛋白基因
+seurat.obj[["percent.hb"]] <- PercentageFeatureSet(seurat.obj, pattern = "^HB[^(P)]")
+
+# 细胞周期基因
+s.genes <- cc.genes$s.genes
+g2m.genes <- cc.genes$g2m.genes
+seurat.obj <- CellCycleScoring(seurat.obj, s.features = s.genes, g2m.features = g2m.genes)
+
+# 复杂质控可视化
+p1 <- VlnPlot(seurat.obj, features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"), ncol = 2)
+p2 <- FeatureScatter(seurat.obj, feature1 = "nCount_RNA", feature2 = "percent.mt")
+p3 <- FeatureScatter(seurat.obj, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+
+# 4. 自适应质控阈值确定
+# 使用MAD方法确定离群值
+qc.metrics <- seurat.obj@meta.data[,c("nFeature_RNA", "nCount_RNA", "percent.mt")]
+
+# 计算每个指标的阈值
+thresholds <- list()
+for(metric in colnames(qc.metrics)) {
+  median_val <- median(qc.metrics[[metric]])
+  mad_val <- mad(qc.metrics[[metric]])
+  
+  if(metric == "percent.mt") {
+    # 线粒体基因上限
+    thresholds[[metric]] <- c(0, median_val + 3 * mad_val)
+  } else {
+    # 特征和UMI计数上下限
+    thresholds[[metric]] <- c(
+      max(200, median_val - 3 * mad_val),
+      median_val + 3 * mad_val
+    )
+  }
+}
+
+print("自适应质控阈值:")
+print(thresholds)
+
+# 5. 细胞过滤
+seurat.obj <- subset(seurat.obj, 
+  subset = nFeature_RNA > thresholds$nFeature_RNA[1] & 
+          nFeature_RNA < thresholds$nFeature_RNA[2] & 
+          nCount_RNA < thresholds$nCount_RNA[2] &
+          percent.mt < thresholds$percent.mt[2]
+)
+
+print(paste("过滤后细胞数:", ncol(seurat.obj)))
+
+# 6. 高级标准化方法
+# 使用SCTransform进行标准化
+seurat.obj <- SCTransform(seurat.obj, 
+                         vars.to.regress = c("percent.mt", "S.Score", "G2M.Score"),
+                         verbose = FALSE)
+
+# 7. 多重降维分析
+# PCA
+seurat.obj <- RunPCA(seurat.obj, features = VariableFeatures(object = seurat.obj))
+
+# 确定最优PC数量
+pct <- seurat.obj[["pca"]]@stdev / sum(seurat.obj[["pca"]]@stdev) * 100
+cumu <- cumsum(pct)
+co1 <- which(cumu > 90 & pct < 5)[1]
+co2 <- sort(which((pct[1:length(pct) - 1] - pct[2:length(pct)]) > 0.1), decreasing = T)[1] + 1
+pcs <- min(co1, co2)
+print(paste("选择PC数量:", pcs))
+
+# 8. 多种聚类策略比较
+# 标准Louvain聚类
+seurat.obj <- FindNeighbors(seurat.obj, dims = 1:pcs)
+
+# 测试多个分辨率
+resolutions <- seq(0.1, 1.0, by = 0.1)
+for(res in resolutions) {
+  seurat.obj <- FindClusters(seurat.obj, resolution = res)
+}
+
+# 选择最优分辨率（基于silhouette score）
+library(cluster)
+sil_scores <- numeric(length(resolutions))
+for(i in seq_along(resolutions)) {
+  clusters <- seurat.obj@meta.data[[paste0("SCT_snn_res.", resolutions[i])]]
+  if(length(unique(clusters)) > 1) {
+    pca_coords <- Embeddings(seurat.obj, reduction = "pca")[, 1:pcs]
+    sil_scores[i] <- mean(silhouette(as.numeric(as.factor(clusters)), 
+                                   dist(pca_coords))[, 3])
+  }
+}
+
+optimal_res <- resolutions[which.max(sil_scores)]
+Idents(seurat.obj) <- paste0("SCT_snn_res.", optimal_res)
+
+print(paste("最优分辨率:", optimal_res))
+print(paste("聚类数量:", length(unique(Idents(seurat.obj)))))
+
+# 9. UMAP和tSNE可视化
+seurat.obj <- RunUMAP(seurat.obj, dims = 1:pcs)
+seurat.obj <- RunTSNE(seurat.obj, dims = 1:pcs)
+
+# 可视化比较
+p1 <- DimPlot(seurat.obj, reduction = "umap", group.by = "ident", label = TRUE)
+p2 <- DimPlot(seurat.obj, reduction = "tsne", group.by = "ident", label = TRUE)
+p1 + p2
+
+# 10. 复杂差异基因分析
+# 使用多种统计方法
+cluster.markers <- FindAllMarkers(seurat.obj, 
+                                 only.pos = TRUE,
+                                 min.pct = 0.25, 
+                                 logfc.threshold = 0.25,
+                                 test.use = "wilcox")
+
+# MAST方法（考虑细胞检测率）
+library(MAST)
+cluster.markers.mast <- FindAllMarkers(seurat.obj, 
+                                      test.use = "MAST",
+                                      only.pos = TRUE,
+                                      min.pct = 0.25)
+
+# 11. 多重细胞类型注释策略
+# SingleR自动注释
+ref.data <- celldex::HumanPrimaryCellAtlasData()
+sce <- as.SingleCellExperiment(seurat.obj)
+predictions <- SingleR(test = sce, ref = ref.data, labels = ref.data$label.main)
+seurat.obj$SingleR.labels <- predictions$labels
+
+# 基于标记基因的手动注释
+canonical.markers <- list(
+  "T_cells" = c("CD3D", "CD3E", "CD3G"),
+  "B_cells" = c("CD79A", "CD79B", "MS4A1"),
+  "NK_cells" = c("GNLY", "NKG7", "GZMA"),
+  "Monocytes" = c("CD14", "FCGR3A", "LYZ"),
+  "DC" = c("FCER1A", "CST3", "CD1C"),
+  "Platelets" = c("PPBP", "PF4", "TUBB1")
+)
+
+# 计算每个聚类的标记基因得分
+for(cell.type in names(canonical.markers)) {
+  seurat.obj <- AddModuleScore(seurat.obj, 
+                              features = list(canonical.markers[[cell.type]]),
+                              name = paste0(cell.type, "_score"))
+}
+
+# 12. 聚类注释和验证
+# 基于标记基因得分进行注释
+cluster.annotation <- function(seurat.obj, cluster.id) {
+  cluster.cells <- WhichCells(seurat.obj, idents = cluster.id)
+  
+  scores <- sapply(names(canonical.markers), function(ct) {
+    score.name <- paste0(ct, "_score1")
+    if(score.name %in% colnames(seurat.obj@meta.data)) {
+      mean(seurat.obj@meta.data[cluster.cells, score.name])
+    } else {
+      0
+    }
+  })
+  
+  return(names(scores)[which.max(scores)])
+}
+
+# 为每个聚类分配细胞类型
+cluster.ids <- levels(Idents(seurat.obj))
+cell.type.annotations <- sapply(cluster.ids, cluster.annotation, seurat.obj = seurat.obj)
+names(cell.type.annotations) <- cluster.ids
+
+print("聚类注释结果:")
+print(cell.type.annotations)
+
+# 应用注释
+new.cluster.ids <- cell.type.annotations
+names(new.cluster.ids) <- levels(seurat.obj)
+seurat.obj <- RenameIdents(seurat.obj, new.cluster.ids)
+seurat.obj$cell.type <- Idents(seurat.obj)
+
+# 13. 结果可视化和验证
+# 注释结果可视化
+p1 <- DimPlot(seurat.obj, reduction = "umap", group.by = "cell.type", label = TRUE)
+p2 <- DimPlot(seurat.obj, reduction = "umap", group.by = "SingleR.labels", label = TRUE)
+
+# 标记基因热图
+top.markers <- cluster.markers %>% 
+  group_by(cluster) %>% 
+  top_n(n = 3, wt = avg_log2FC)
+
+DoHeatmap(seurat.obj, features = top.markers$gene, group.by = "cell.type")
+
+# 14. 高级分析：轨迹分析准备
+library(monocle3)
+library(SeuratWrappers)
+
+# 转换为CDS格式进行轨迹分析
+cds <- as.cell_data_set(seurat.obj)
+cds <- cluster_cells(cds)
+cds <- learn_graph(cds)
+
+print("复杂单细胞RNA-seq注释分析完成！")
+print(paste("最终识别细胞类型:", length(unique(seurat.obj$cell.type))))
+
+# 保存结果
+saveRDS(seurat.obj, "complex_scRNA_annotated.rds")
+
+\bio

@@ -60,7 +60,10 @@ const contentMap = {
   '/troubleshooting': 'trouble/troubleshooting',
   '/trouble/common-errors': 'trouble/common-errors',
   '/trouble/debugging': 'trouble/debugging',
-  '/trouble/faq': 'trouble/faq'
+  '/trouble/faq': 'trouble/faq',
+  
+  '/release-notes': 'release-notes',
+  '/join-us': 'join-us'
 }
 
 const loadMarkdown = async () => {

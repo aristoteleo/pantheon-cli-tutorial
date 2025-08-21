@@ -1,0 +1,109 @@
+# ATAC-seq上游处理终端演示
+
+# 启动终端进行ATAC-seq数据处理
+bash
+
+# 1. 环境准备和质控检查
+# 检查数据质量
+fastqc raw_data/*.fastq.gz -o fastqc_output/
+
+# 查看质控报告
+multiqc fastqc_output/ -o multiqc_report/
+
+# 2. 数据预处理 - 接头去除和质控
+# 使用trimmomatic去除接头和低质量reads
+trimmomatic PE -phred33 \
+  sample_R1.fastq.gz sample_R2.fastq.gz \
+  sample_R1_paired.fastq.gz sample_R1_unpaired.fastq.gz \
+  sample_R2_paired.fastq.gz sample_R2_unpaired.fastq.gz \
+  ILLUMINACLIP:TruSeq3-PE.fa:2:30:10 \
+  LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36
+
+# 3. 参考基因组比对
+# 使用bowtie2进行比对
+bowtie2 -x hg38_index \
+  -1 sample_R1_paired.fastq.gz \
+  -2 sample_R2_paired.fastq.gz \
+  -S sample_aligned.sam \
+  -p 8 --very-sensitive --no-discordant --no-mixed
+
+# 转换为BAM格式并排序
+samtools view -bS sample_aligned.sam | samtools sort -o sample_sorted.bam
+samtools index sample_sorted.bam
+
+# 4. 去重和过滤
+# 使用picard去除重复reads
+picard MarkDuplicates \
+  I=sample_sorted.bam \
+  O=sample_deduped.bam \
+  M=sample_metrics.txt \
+  REMOVE_DUPLICATES=true
+
+# 过滤低质量比对
+samtools view -h -f 2 -q 30 sample_deduped.bam | \
+  samtools view -bS - > sample_filtered.bam
+samtools index sample_filtered.bam
+
+# 5. 去除线粒体和黑名单区域
+# 下载黑名单区域文件
+wget -O blacklist.bed.gz \
+  "https://github.com/Boyle-Lab/Blacklist/raw/master/lists/hg38-blacklist.v2.bed.gz"
+gunzip blacklist.bed.gz
+
+# 移除黑名单区域和线粒体reads
+bedtools intersect -v -abam sample_filtered.bam -b blacklist.bed > sample_clean.bam
+samtools view -h sample_clean.bam | \
+  awk '($1 ~ /^@/ || $3 != "chrM")' | \
+  samtools view -bS - > sample_final.bam
+samtools index sample_final.bam
+
+# 6. 片段大小分析
+# 使用bamPEFragmentSize分析插入片段大小
+bamPEFragmentSize -b sample_final.bam \
+  --maxFragmentLength 1000 \
+  --histogram fragmentSizes.png \
+  --numberOfProcessors 8
+
+# 7. 生成覆盖度轨迹文件
+# 生成标准化的bigwig文件
+bamCoverage -b sample_final.bam \
+  -o sample_coverage.bw \
+  --binSize 10 \
+  --normalizeUsing RPKM \
+  --numberOfProcessors 8
+
+# 8. 质量控制检查
+# 使用phantompeakqualtools进行质量评估
+Rscript run_spp.R -c=sample_final.bam -savp=sample_qc_plot.pdf
+
+# 计算TSS enrichment
+computeMatrix reference-point \
+  --referencePoint TSS \
+  -b 2000 -a 2000 \
+  -R genes_TSS.bed \
+  -S sample_coverage.bw \
+  --skipZeros \
+  -o matrix_TSS.gz
+
+plotHeatmap -m matrix_TSS.gz \
+  -out TSS_enrichment.png \
+  --colorMap Blues \
+  --whatToShow 'heatmap and colorbar'
+
+# 9. Peak calling准备
+# 生成用于peak calling的标准化文件
+macs2 callpeak -t sample_final.bam \
+  -f BAMPE -n sample \
+  -g hs --keep-dup all \
+  --outdir peaks/ \
+  -q 0.05
+
+# 10. 结果汇总
+echo "ATAC-seq上游处理完成"
+echo "生成文件："
+echo "- sample_final.bam: 最终处理的比对文件"
+echo "- sample_coverage.bw: 覆盖度轨迹文件"  
+echo "- peaks/: peak calling结果目录"
+echo "- 质控报告: fastqc_output/ 和 multiqc_report/"
+
+\bio

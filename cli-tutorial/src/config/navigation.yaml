@@ -69,10 +69,10 @@ navigation:
         key: caseAtacUpstream
       - path: /cases/rna-upstream
         key: caseRnaUpstream
-      - path: /cases/mixed-python-r
-        key: caseMixedPythonR
       - path: /cases/molecular-docking
         key: caseMolecularDocking
+      - path: /cases/mixed-python-r
+        key: caseMixedPythonR
       - path: /cases/seurat-llm-annotation
         key: caseSeuratLlmAnnotation
   
@@ -86,3 +86,12 @@ navigation:
         key: troubleDebugging
       - path: /trouble/faq
         key: troubleFaq
+  
+  - key: releaseNotes
+    path: /release-notes
+  
+  - key: github
+    url: https://github.com/aristoteleo/pantheon-cli
+  
+  - key: joinUs
+    path: /join-us

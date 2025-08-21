@@ -1,0 +1,231 @@
+# 单细胞LLM自动学习终端演示
+
+# 启动Python环境进行在线教程学习
+python
+
+# 1. 环境设置和依赖导入
+import requests
+import pandas as pd
+import numpy as np
+import scanpy as sc
+from transformers import AutoTokenizer, AutoModel
+import openai
+from bs4 import BeautifulSoup
+import json
+
+# 设置scanpy环境
+sc.settings.verbosity = 3
+sc.settings.set_figure_params(dpi=80, facecolor='white')
+
+# 2. 在线教程内容抓取
+def fetch_tutorial_content(url):
+    """从在线教程抓取单细胞分析内容"""
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    # 提取代码块和文本内容
+    code_blocks = [code.get_text() for code in soup.find_all('code')]
+    text_content = soup.get_text()
+    
+    return {'code': code_blocks, 'text': text_content}
+
+# 抓取Scanpy官方教程
+tutorial_url = "https://scanpy.readthedocs.io/en/stable/tutorials.html"
+tutorial_content = fetch_tutorial_content(tutorial_url)
+
+print(f"成功抓取 {len(tutorial_content['code'])} 个代码块")
+
+# 3. LLM辅助代码生成
+def query_scLLM(prompt, context=None):
+    """查询单细胞领域专用LLM"""
+    system_prompt = """你是单细胞RNA测序数据分析专家。
+    基于scanpy和最佳实践提供可执行的代码和详细解释。"""
+    
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": f"上下文: {context}\n问题: {prompt}" if context else prompt}
+    ]
+    
+    # 调用GPT-4或专用生物信息学模型
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=messages,
+        temperature=0.1,
+        max_tokens=1500
+    )
+    
+    return response.choices[0].message.content
+
+# 4. 智能化单细胞分析流程
+# 询问LLM最佳的数据加载实践
+loading_advice = query_scLLM(
+    "如何使用scanpy加载和预处理10X Genomics数据？",
+    context=tutorial_content['text'][:500]
+)
+
+print("LLM建议的数据加载方法:")
+print(loading_advice)
+
+# 5. 基于LLM建议执行分析
+# 加载示例数据
+adata = sc.datasets.pbmc3k_processed()
+print(f"数据维度: {adata.shape}")
+
+# 询问质控建议
+qc_advice = query_scLLM(
+    "单细胞RNA-seq数据质控应该包含哪些指标？如何设置过滤阈值？"
+)
+
+print("质控建议:")
+print(qc_advice)
+
+# 6. 智能质控执行
+# 基于LLM建议执行质控
+adata.var['mt'] = adata.var_names.str.startswith('MT-')
+sc.pp.calculate_qc_metrics(adata, percent_top=None, log1p=False, inplace=True)
+
+# 询问标准化方法
+norm_advice = query_scLLM(
+    "单细胞数据标准化有哪些方法？什么时候使用log标准化vs更高级方法？"
+)
+
+print("标准化建议:")
+print(norm_advice)
+
+# 执行标准化
+sc.pp.normalize_total(adata, target_sum=1e4)
+sc.pp.log1p(adata)
+
+# 7. 智能特征选择
+feature_advice = query_scLLM(
+    "如何选择高变基因？如何避免选择细胞周期基因影响？"
+)
+
+print("特征选择建议:")
+print(feature_advice)
+
+# 基于建议选择特征
+sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
+sc.pl.highly_variable_genes(adata)
+
+# 8. 聚类参数优化
+clustering_advice = query_scLLM(
+    "如何选择最优聚类分辨率？如何评估聚类质量？"
+)
+
+print("聚类建议:")
+print(clustering_advice)
+
+# 执行降维和聚类
+sc.pp.scale(adata, max_value=10)
+sc.tl.pca(adata, svd_solver='arpack')
+sc.pp.neighbors(adata, n_neighbors=10, n_pcs=40)
+
+# 测试多个分辨率
+for res in [0.1, 0.3, 0.5, 0.7]:
+    sc.tl.leiden(adata, resolution=res, key_added=f'leiden_res{res}')
+
+# 9. 细胞类型注释指导
+annotation_advice = query_scLLM(
+    "PBMC数据的主要细胞类型和标记基因是什么？如何进行自动注释？"
+)
+
+print("注释建议:")
+print(annotation_advice)
+
+# 基于建议进行注释
+sc.tl.leiden(adata, resolution=0.5)
+sc.tl.rank_genes_groups(adata, 'leiden', method='wilcoxon')
+
+# 可视化结果
+sc.pl.umap(adata, color=['leiden', 'CST3', 'NKG7', 'PPBP'])
+
+# 10. 高级分析推荐
+advanced_advice = query_scLLM(
+    "完成基础聚类后，还可以进行哪些高级分析？轨迹分析、细胞通讯等？"
+)
+
+print("高级分析建议:")
+print(advanced_advice)
+
+# 11. 自动代码执行（安全检查）
+def execute_llm_code(code_string):
+    """安全执行LLM生成的代码"""
+    # 简单安全检查
+    dangerous_patterns = ['import os', 'subprocess', 'eval', 'exec']
+    
+    if any(pattern in code_string for pattern in dangerous_patterns):
+        print("检测到潜在风险代码，跳过执行")
+        return
+    
+    try:
+        exec(code_string, globals())
+        print("代码执行成功")
+    except Exception as e:
+        print(f"代码执行失败: {e}")
+
+# 12. 轨迹分析代码生成
+trajectory_code = query_scLLM(
+    "生成使用scanpy进行轨迹分析的代码，包括PAGA和diffusion map。"
+)
+
+print("LLM生成的轨迹分析代码:")
+print(trajectory_code)
+
+# 13. 智能结果解释
+current_analysis = f"""
+分析结果概况:
+- 细胞数量: {adata.n_obs}
+- 基因数量: {adata.n_vars}
+- 识别聚类数: {len(adata.obs['leiden'].unique())}
+- 高变基因数: {sum(adata.var['highly_variable'])}
+"""
+
+interpretation = query_scLLM(
+    f"请解释以下分析结果的生物学意义：{current_analysis}"
+)
+
+print("结果解释:")
+print(interpretation)
+
+# 14. 学习记录和参数优化
+def adaptive_tuning():
+    """基于当前结果提供优化建议"""
+    n_clusters = len(adata.obs['leiden'].unique())
+    
+    if n_clusters < 5:
+        return query_scLLM(f"只有{n_clusters}个聚类，如何提高分辨率？")
+    elif n_clusters > 15:
+        return query_scLLM(f"{n_clusters}个聚类太多，如何优化参数？")
+    else:
+        return query_scLLM(f"{n_clusters}个聚类合理，如何验证质量？")
+
+tuning_advice = adaptive_tuning()
+print("参数调优建议:")
+print(tuning_advice)
+
+# 15. 保存学习结果
+learning_log = {
+    'tutorial_sources': [tutorial_url],
+    'llm_interactions': [
+        loading_advice, qc_advice, norm_advice, 
+        feature_advice, clustering_advice, annotation_advice
+    ],
+    'analysis_summary': {
+        'n_cells': adata.n_obs,
+        'n_genes': adata.n_vars,
+        'n_clusters': len(adata.obs['leiden'].unique())
+    }
+}
+
+# 保存结果
+adata.write('scllm_result.h5ad')
+with open('learning_log.json', 'w') as f:
+    json.dump(learning_log, f, indent=2)
+
+print("单细胞LLM辅助分析完成！")
+print("输出文件：")
+print("- scllm_result.h5ad: 分析结果")
+print("- learning_log.json: 学习记录")
+
+\bio

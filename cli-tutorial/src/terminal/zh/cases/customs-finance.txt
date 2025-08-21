@@ -1,0 +1,155 @@
+# 金融目标客户分析终端演示
+
+# 启动Python环境进行金融数据分析
+python
+
+# 1. 导入必要的库
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+
+# 2. 加载客户数据
+customer_data = pd.read_csv('customer_financial_data.csv')
+print(f"数据形状: {customer_data.shape}")
+print(f"字段列表: {list(customer_data.columns)}")
+
+# 数据概览
+customer_data.head()
+customer_data.describe()
+
+# 3. 数据预处理和特征工程
+# 处理缺失值
+customer_data.fillna(customer_data.median(), inplace=True)
+
+# 创建关键特征
+customer_data['income_to_debt_ratio'] = customer_data['annual_income'] / (customer_data['total_debt'] + 1)
+customer_data['credit_utilization'] = customer_data['credit_used'] / customer_data['credit_limit']
+customer_data['age_group'] = pd.cut(customer_data['age'], bins=[0, 30, 45, 60, 100], labels=['Young', 'Middle', 'Senior', 'Elder'])
+
+# 4. 客户细分分析
+# 选择聚类特征
+cluster_features = ['annual_income', 'credit_score', 'total_debt', 'account_balance', 
+                   'income_to_debt_ratio', 'credit_utilization']
+
+# 标准化数据
+scaler = StandardScaler()
+scaled_features = scaler.fit_transform(customer_data[cluster_features])
+
+# K-means聚类
+kmeans = KMeans(n_clusters=4, random_state=42)
+customer_data['cluster'] = kmeans.fit_predict(scaled_features)
+
+# 可视化聚类结果
+plt.figure(figsize=(12, 8))
+scatter = plt.scatter(customer_data['annual_income'], customer_data['credit_score'], 
+                     c=customer_data['cluster'], cmap='viridis', alpha=0.6)
+plt.xlabel('年收入')
+plt.ylabel('信用评分')
+plt.title('客户细分聚类分析')
+plt.colorbar(scatter)
+plt.show()
+
+# 5. 聚类特征分析
+cluster_summary = customer_data.groupby('cluster')[cluster_features].mean()
+print("各聚类群体特征:")
+print(cluster_summary)
+
+# 6. 客户价值评估
+# 定义高价值客户标准
+customer_data['high_value'] = (
+    (customer_data['annual_income'] > customer_data['annual_income'].quantile(0.7)) &
+    (customer_data['credit_score'] > 650) &
+    (customer_data['account_balance'] > customer_data['account_balance'].quantile(0.6))
+).astype(int)
+
+# 7. 预测模型构建
+# 准备特征和目标变量
+feature_cols = ['age', 'annual_income', 'credit_score', 'total_debt', 
+               'account_balance', 'income_to_debt_ratio', 'credit_utilization']
+
+X = customer_data[feature_cols]
+y = customer_data['high_value']
+
+# 划分训练测试集
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 训练随机森林模型
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)
+
+# 模型评估
+train_score = rf_model.score(X_train, y_train)
+test_score = rf_model.score(X_test, y_test)
+
+print(f"训练集准确率: {train_score:.3f}")
+print(f"测试集准确率: {test_score:.3f}")
+
+# 特征重要性分析
+feature_importance = pd.DataFrame({
+    'feature': feature_cols,
+    'importance': rf_model.feature_importances_
+}).sort_values('importance', ascending=False)
+
+print("特征重要性排序:")
+print(feature_importance)
+
+# 8. 目标客户识别
+# 预测所有客户的价值概率
+customer_data['value_probability'] = rf_model.predict_proba(X)[:, 1]
+
+# 识别前10%高潜力客户
+top_prospects = customer_data.nlargest(int(len(customer_data) * 0.1), 'value_probability')
+
+print(f"识别出 {len(top_prospects)} 个高潜力目标客户")
+print("目标客户特征:")
+print(top_prospects[['annual_income', 'credit_score', 'account_balance', 'value_probability']].describe())
+
+# 9. 营销建议生成
+def generate_marketing_strategy(cluster_id, cluster_data):
+    """为不同聚类生成营销策略"""
+    
+    avg_income = cluster_data['annual_income'].mean()
+    avg_credit = cluster_data['credit_score'].mean()
+    avg_balance = cluster_data['account_balance'].mean()
+    
+    if avg_income > 80000 and avg_credit > 700:
+        return "高端客户群体 - 推荐高价值投资产品和私人银行服务"
+    elif avg_income > 50000 and avg_credit > 650:
+        return "中高端客户 - 推荐理财产品和信用卡升级服务"
+    elif avg_credit < 600:
+        return "信用修复客户 - 推荐信用修复服务和小额贷款产品"
+    else:
+        return "普通客户 - 推荐基础储蓄产品和标准信用卡"
+
+# 为每个聚类生成策略
+for cluster_id in customer_data['cluster'].unique():
+    cluster_data = customer_data[customer_data['cluster'] == cluster_id]
+    strategy = generate_marketing_strategy(cluster_id, cluster_data)
+    print(f"聚类 {cluster_id}: {strategy}")
+
+# 10. 结果导出
+# 保存目标客户名单
+top_prospects[['customer_id', 'annual_income', 'credit_score', 'value_probability', 'cluster']].to_csv('target_customers.csv', index=False)
+
+# 保存营销策略报告
+marketing_report = customer_data.groupby('cluster').agg({
+    'customer_id': 'count',
+    'annual_income': 'mean',
+    'credit_score': 'mean',
+    'account_balance': 'mean',
+    'value_probability': 'mean'
+}).round(2)
+
+marketing_report.to_csv('cluster_marketing_strategy.csv')
+
+print("分析完成！")
+print("生成文件:")
+print("- target_customers.csv: 高潜力目标客户名单")
+print("- cluster_marketing_strategy.csv: 分群营销策略报告")
+
+\bio

@@ -12,10 +12,11 @@
       <div v-for="item in menuItems" :key="item.key" class="menu-section">
         <div 
           v-if="!item.children"
-          @click="navigateTo(item.path)"
-          :class="['nav-item', { active: isActive(item.path) }]"
+          @click="item.url ? openExternalLink(item.url) : navigateTo(item.path)"
+          :class="['nav-item', { active: isActive(item.path), external: !!item.url }]"
         >
           <span class="nav-text">{{ t(`nav.${item.key}`) }}</span>
+          <span v-if="item.url" class="external-icon">↗</span>
         </div>
         
         <div v-else class="menu-group">
@@ -84,6 +85,11 @@
           <option value="zh">中文</option>
         </select>
       </div>
+      
+      <div class="copyright-info">
+        <div class="dev-team">By Pantheon development team</div>
+        <div class="copyright">© Copyright 2025, Aristoteleo.</div>
+      </div>
     </div>
   </aside>
 </template>
@@ -144,6 +150,8 @@ const updateExpandedSections = () => {
     expandedSections['basicCommands'] = true
   } else if (currentPath === '/advanced-usage' || currentPath.startsWith('/advanced/')) {
     expandedSections['advancedUsage'] = true
+  } else if (currentPath.startsWith('/cases/')) {
+    expandedSections['realCases'] = true
   } else if (currentPath === '/troubleshooting' || currentPath.startsWith('/trouble/')) {
     expandedSections['troubleshooting'] = true
   }
@@ -162,7 +170,14 @@ const navigateTo = (path) => {
   router.push(path)
 }
 
+const openExternalLink = (url) => {
+  window.open(url, '_blank', 'noopener,noreferrer')
+}
+
 const isActive = (path) => {
+  // 如果没有path（外部链接），不激活
+  if (!path) return false
+  
   // 完全匹配
   if (route.path === path) return true
   
@@ -171,6 +186,7 @@ const isActive = (path) => {
   if (path === '/installation' && route.path.startsWith('/installation/')) return true
   if (path === '/basic-commands' && route.path.startsWith('/basic/')) return true
   if (path === '/advanced-usage' && route.path.startsWith('/advanced/')) return true
+  if (path.startsWith('/cases/') && route.path === path) return true
   if (path === '/troubleshooting' && route.path.startsWith('/trouble/')) return true
   
   return false
@@ -229,12 +245,12 @@ const changeLocale = () => {
 }
 
 .logo-text {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 600;
   color: var(--text-primary);
   text-align: center;
-  letter-spacing: 0.5px;
-  font-family: 'Georgia', serif;
+  letter-spacing: 0.3px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
 
 .nav-menu {
@@ -298,6 +314,22 @@ const changeLocale = () => {
   font-size: 14px;
   flex: 1;
   text-align: left;
+}
+
+.nav-item.external {
+  position: relative;
+}
+
+.external-icon {
+  position: absolute;
+  right: 20px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.nav-item.external:hover .external-icon {
+  color: var(--text-primary);
 }
 
 .submenu {
@@ -433,6 +465,27 @@ const changeLocale = () => {
   border-radius: 6px;
   color: var(--text-primary);
   cursor: pointer;
+}
+
+.copyright-info {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.dev-team {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.copyright {
+  font-size: 10px;
+  color: var(--text-secondary);
+  opacity: 0.8;
+  line-height: 1.4;
 }
 
 .sidebar::-webkit-scrollbar {

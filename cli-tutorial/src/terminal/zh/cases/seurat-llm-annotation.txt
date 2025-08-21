@@ -1,0 +1,99 @@
+# Seurat与自然语言混合注释真实案例
+
+# 启动R环境
+run r :library(dplyr)
+library(Seurat)
+library(patchwork)
+
+# 加载PBMC数据集
+# Load the PBMC dataset
+pbmc.data <- Read10X(data.dir = "/brahms/mollag/practice/filtered_gene_bc_matrices/hg19/")
+# Initialize the Seurat object with the raw (non-normalized data).
+pbmc <- CreateSeuratObject(counts = pbmc.data, project = "pbmc3k", min.cells = 3, min.features = 200)
+pbmc
+
+# 如果路径不存在，使用替代路径
+could you use /Users/fernandozeng/Downloads/pbmc3k_filtered_gene_bc_matrices.tar.gz instead?
+
+# 检查Seurat对象
+>pbmc
+
+# 计算质控指标
+pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-")
+
+# 可视化质控指标
+VlnPlot(pbmc, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+
+# 质控过滤
+pbmc <- subset(pbmc, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 20)
+
+# 标准化数据
+pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
+
+# 找到高变基因
+pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000)
+
+# 可视化高变基因
+top10 <- head(VariableFeatures(pbmc), 10)
+plot1 <- VariableFeaturePlot(pbmc)
+plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
+plot1 + plot2
+
+# 数据标准化
+all.genes <- rownames(pbmc)
+pbmc <- ScaleData(pbmc, features = all.genes)
+
+# PCA分析
+pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc))
+
+# 可视化PCA结果
+print(pbmc[["pca"]], dims = 1:5, nfeatures = 5)
+VizDimLoadings(pbmc, dims = 1:2, reduction = "pca")
+DimPlot(pbmc, reduction = "pca")
+
+# 确定显著PC数量
+pbmc <- JackStraw(pbmc, num.replicate = 100)
+pbmc <- ScoreJackStraw(pbmc, dims = 1:20)
+JackStrawPlot(pbmc, dims = 1:15)
+ElbowPlot(pbmc)
+
+# 聚类分析
+pbmc <- FindNeighbors(pbmc, dims = 1:10)
+pbmc <- FindClusters(pbmc, resolution = 0.5)
+
+# 查看聚类头部信息
+head(Idents(pbmc), 5)
+
+# UMAP分析
+pbmc <- RunUMAP(pbmc, dims = 1:10)
+
+# 可视化聚类结果
+DimPlot(pbmc, reduction = "umap")
+
+# 寻找聚类标记基因
+pbmc.markers <- FindAllMarkers(pbmc, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+pbmc.markers %>%
+    group_by(cluster) %>%
+    slice_max(n = 2, order_by = avg_log2FC)
+
+# 查看特定聚类的标记基因
+cluster0.markers <- FindMarkers(pbmc, ident.1 = 0, min.pct = 0.25)
+head(cluster0.markers, n = 5)
+
+# 可视化标记基因表达
+VlnPlot(pbmc, features = c("MS4A1", "CD79A"))
+
+# 特征图可视化
+FeaturePlot(pbmc, features = c("MS4A1", "GNLY", "CD3E", "CD14", "FCER1A", "FCGR3A", "LYZ", "PPBP", "CD8A"))
+
+# 基于标记基因进行细胞类型注释
+new.cluster.ids <- c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", "CD8 T", "FCGR3A+ Mono", 
+                    "NK", "DC", "Platelet")
+names(new.cluster.ids) <- levels(pbmc)
+pbmc <- RenameIdents(pbmc, new.cluster.ids)
+DimPlot(pbmc, reduction = "umap", label = TRUE, pt.size = 0.5) + NoLegend()
+
+# 保存结果
+saveRDS(pbmc, file = "pbmc3k_final.rds")
+
+\bio

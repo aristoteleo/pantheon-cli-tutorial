@@ -1,0 +1,146 @@
+# RNA-seq上游处理终端演示
+
+# 启动终端进行RNA-seq数据处理
+bash
+
+# 1. 数据质量检查
+# 使用FastQC检查原始数据质量
+fastqc raw_data/*.fastq.gz -o qc_raw/ -t 8
+
+# 生成综合质量报告
+multiqc qc_raw/ -o multiqc_raw/
+
+# 2. 序列质控和预处理
+# 使用fastp进行质控和过滤
+fastp -i sample_R1.fastq.gz -I sample_R2.fastq.gz \
+  -o sample_clean_R1.fastq.gz -O sample_clean_R2.fastq.gz \
+  --thread=8 --html=sample_fastp.html --json=sample_fastp.json \
+  --detect_adapter_for_pe \
+  --cut_front --cut_tail --cut_window_size 4 --cut_mean_quality 20 \
+  --length_required 36
+
+# 检查处理后的数据质量
+fastqc sample_clean_*.fastq.gz -o qc_clean/ -t 8
+multiqc qc_clean/ -o multiqc_clean/
+
+# 3. 参考基因组索引（如果还没有）
+# 构建HISAT2索引
+hisat2-build -p 8 hg38.fa hg38_hisat2_index
+
+# 下载splice sites和exon信息
+hisat2_extract_splice_sites.py gencode.v38.annotation.gtf > splice_sites.txt
+hisat2_extract_exons.py gencode.v38.annotation.gtf > exons.txt
+
+# 重建包含splice site信息的索引
+hisat2-build -p 8 --ss splice_sites.txt --exon exons.txt hg38.fa hg38_hisat2_index
+
+# 4. 序列比对
+# 使用HISAT2进行比对
+hisat2 -x hg38_hisat2_index \
+  -1 sample_clean_R1.fastq.gz \
+  -2 sample_clean_R2.fastq.gz \
+  -S sample.sam \
+  -p 8 --rna-strandness RF
+
+# 转换为BAM格式并排序
+samtools view -bS sample.sam | samtools sort -@ 8 -o sample_sorted.bam
+samtools index sample_sorted.bam
+
+# 清理临时SAM文件
+rm sample.sam
+
+# 5. 比对质量评估
+# 生成比对统计
+samtools flagstat sample_sorted.bam > sample_alignment_stats.txt
+
+# 使用RSeQC进行RNA-seq特异性质控
+# 基因覆盖度分析
+geneBody_coverage.py -r hg38_RefSeq.bed -i sample_sorted.bam -o sample
+
+# 内含子外显子比率
+split_bam.py -i sample_sorted.bam -r hg38_RefSeq.bed -o sample
+
+# 链特异性检查
+infer_experiment.py -r hg38_RefSeq.bed -i sample_sorted.bam
+
+# 6. 转录本定量
+# 使用StringTie进行转录本组装和定量
+stringtie sample_sorted.bam \
+  -G gencode.v38.annotation.gtf \
+  -o sample_assembled.gtf \
+  -A sample_gene_abundances.tab \
+  -e -B \
+  -p 8
+
+# 7. 生成表达量矩阵（多样本情况）
+# 创建样本列表文件
+echo "sample sample_assembled.gtf" > sample_list.txt
+
+# 合并转录本
+stringtie --merge -G gencode.v38.annotation.gtf -o merged.gtf sample_list.txt
+
+# 重新定量所有样本
+stringtie -e -B -p 8 -G merged.gtf -o sample_final.gtf sample_sorted.bam
+
+# 8. 使用featureCounts进行基因计数
+featureCounts -a gencode.v38.annotation.gtf \
+  -o sample_gene_counts.txt \
+  -p -B -C -t exon -g gene_id \
+  -T 8 \
+  sample_sorted.bam
+
+# 9. 生成覆盖度文件用于可视化
+# 生成标准化的bigwig文件
+bamCoverage -b sample_sorted.bam \
+  -o sample_coverage.bw \
+  --binSize 10 \
+  --normalizeUsing RPKM \
+  --numberOfProcessors 8
+
+# 分链生成bigwig文件
+bamCoverage -b sample_sorted.bam \
+  -o sample_forward.bw \
+  --binSize 10 \
+  --normalizeUsing RPKM \
+  --filterRNAstrand forward \
+  --numberOfProcessors 8
+
+bamCoverage -b sample_sorted.bam \
+  -o sample_reverse.bw \
+  --binSize 10 \
+  --normalizeUsing RPKM \
+  --filterRNAstrand reverse \
+  --numberOfProcessors 8
+
+# 10. 质控报告整合
+# 生成最终的MultiQC报告
+multiqc . -o final_qc_report/ --title "RNA-seq Processing Report"
+
+# 11. 结果文件整理
+mkdir -p results/{bam,counts,coverage,qc}
+
+# 移动结果文件到对应目录
+mv sample_sorted.bam* results/bam/
+mv *counts.txt results/counts/
+mv *.bw results/coverage/
+mv *qc* results/qc/
+mv final_qc_report/ results/qc/
+
+# 12. 生成处理摘要
+echo "RNA-seq上游处理完成"
+echo ""
+echo "处理统计："
+grep "overall alignment rate" sample_alignment_stats.txt
+echo ""
+echo "输出文件："
+echo "- results/bam/: 比对结果文件"
+echo "- results/counts/: 基因表达计数文件"
+echo "- results/coverage/: 覆盖度轨迹文件"
+echo "- results/qc/: 质量控制报告"
+echo ""
+echo "主要结果文件："
+echo "- sample_gene_counts.txt: 基因水平表达计数"
+echo "- sample_gene_abundances.tab: 基因丰度估计"
+echo "- sample_coverage.bw: 基因组覆盖度轨迹"
+
+\bio
