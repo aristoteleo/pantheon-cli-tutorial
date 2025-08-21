@@ -27,7 +27,10 @@
           </div>
           
           <div class="output-block" v-if="block.type === 'output'">
-            <pre class="output-text">{{ block.content }}</pre>
+            <pre class="output-text" :class="{ 'long-box': isLongBox(block.content) }">{{ truncateIfNeeded(block.content) }}</pre>
+            <div v-if="isLongBox(block.content) && block.content.length > 2000" class="truncate-hint">
+              <span class="hint-text">内容过长已截断，显示前2000字符</span>
+            </div>
           </div>
           
           <div class="comment-line" v-if="block.type === 'comment'">
@@ -269,6 +272,24 @@ const resetDemo = () => {
   }
 }
 
+// 检测是否是长框内容
+const isLongBox = (content) => {
+  if (!content) return false
+  return content.includes('╭') || content.includes('│') || content.includes('╰')
+}
+
+// 截断过长内容
+const truncateIfNeeded = (content) => {
+  if (!content) return ''
+  
+  // 对于长框内容，如果超过2000字符则截断
+  if (isLongBox(content) && content.length > 2000) {
+    return content.substring(0, 2000) + '\n...'
+  }
+  
+  return content
+}
+
 // 光标闪烁
 setInterval(() => {
   showCursor.value = !showCursor.value
@@ -410,6 +431,57 @@ setInterval(() => {
   margin: 0;
   font-family: inherit;
   line-height: 1.5;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* 处理长框和ASCII艺术的特殊情况 */
+.output-text.long-box {
+  font-size: 11px;
+  overflow-x: auto;
+  white-space: pre;
+  max-height: 400px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.05);
+  border-left: 2px solid var(--accent-color);
+  padding: 8px;
+  border-radius: 4px;
+}
+
+/* 长行截断处理 */
+.output-text {
+  word-break: break-all;
+}
+
+.output-text::-webkit-scrollbar {
+  height: 4px;
+}
+
+.output-text::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.output-text::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+.output-text::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+.truncate-hint {
+  margin-top: 8px;
+  padding: 4px 8px;
+  background: var(--comment-bg, rgba(255, 165, 0, 0.1));
+  border-left: 2px solid #ffa500;
+  border-radius: 3px;
+}
+
+.hint-text {
+  font-size: 11px;
+  color: #ffa500;
+  font-style: italic;
 }
 
 .comment-line {

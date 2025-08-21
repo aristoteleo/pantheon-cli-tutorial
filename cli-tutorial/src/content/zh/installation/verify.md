@@ -7,7 +7,7 @@
 ### 1. 检查版本
 
 ```bash
-pantheon --version
+pantheon-cli --version
 ```
 
 预期输出：
@@ -17,26 +17,30 @@ Python 3.11.0
 Platform: Darwin-23.0.0-x86_64
 ```
 
-### 2. 查看帮助信息
+### 2. 启动Pantheon-CLI
+
+直接在终端输入以下命令启动界面：
 
 ```bash
-pantheon --help
+pantheon-cli
 ```
 
-你应该看到完整的命令列表和选项说明。
+成功启动后，你应该看到Pantheon-CLI的交互界面。
 
-### 3. 运行诊断
+### 3. 测试基本功能
+
+在Pantheon-CLI界面中尝试以下操作：
 
 ```bash
-pantheon doctor
-```
+# 创建一些测试数据
+生成10个随机数
 
-这会检查：
-- ✅ Python版本
-- ✅ 必需依赖
-- ✅ 可选组件
-- ✅ 网络连接
-- ✅ 配置文件
+# 查看数据统计
+显示均值和标准差
+
+# 退出界面  
+exit
+```
 
 ## 功能测试
 

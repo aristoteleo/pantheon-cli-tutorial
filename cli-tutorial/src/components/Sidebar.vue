@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
 import { useThemeStore } from '../stores/theme'
@@ -81,14 +81,38 @@ const loadNavigation = async () => {
     
     menuItems.value = config.navigation
     
-    // Initialize expanded sections
-    config.navigation.forEach(item => {
-      expandedSections[item.key] = item.key === 'introduction'
-    })
+    // Initialize expanded sections based on current route
+    updateExpandedSections()
   } catch (error) {
     console.error('Failed to load navigation config:', error)
   }
 }
+
+const updateExpandedSections = () => {
+  // 根据当前路由设置展开状态
+  const currentPath = route.path
+  
+  // 重置所有展开状态
+  Object.keys(expandedSections).forEach(key => {
+    expandedSections[key] = false
+  })
+  
+  // 根据路径设置对应的父级为展开状态
+  if (currentPath === '/' || currentPath.startsWith('/intro/')) {
+    expandedSections['introduction'] = true
+  } else if (currentPath === '/installation' || currentPath.startsWith('/installation/')) {
+    expandedSections['installation'] = true
+  } else if (currentPath === '/basic-commands' || currentPath.startsWith('/basic/')) {
+    expandedSections['basicCommands'] = true
+  } else if (currentPath === '/advanced-usage' || currentPath.startsWith('/advanced/')) {
+    expandedSections['advancedUsage'] = true
+  } else if (currentPath === '/troubleshooting' || currentPath.startsWith('/trouble/')) {
+    expandedSections['troubleshooting'] = true
+  }
+}
+
+// 监听路由变化，更新展开状态
+watch(() => route.path, updateExpandedSections)
 
 onMounted(loadNavigation)
 
@@ -101,7 +125,17 @@ const navigateTo = (path) => {
 }
 
 const isActive = (path) => {
-  return route.path === path
+  // 完全匹配
+  if (route.path === path) return true
+  
+  // 如果是子页面，检查是否属于当前父级路径
+  if (path === '/' && route.path.startsWith('/intro/')) return true
+  if (path === '/installation' && route.path.startsWith('/installation/')) return true
+  if (path === '/basic-commands' && route.path.startsWith('/basic/')) return true
+  if (path === '/advanced-usage' && route.path.startsWith('/advanced/')) return true
+  if (path === '/troubleshooting' && route.path.startsWith('/trouble/')) return true
+  
+  return false
 }
 
 const toggleTheme = () => {

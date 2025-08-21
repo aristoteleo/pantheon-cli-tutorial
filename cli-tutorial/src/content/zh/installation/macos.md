@@ -2,29 +2,58 @@
 
 在macOS系统上安装Pantheon-CLI的详细步骤。
 
-## 方法一：使用Homebrew（推荐）
+## 准备工作
 
-### 1. 安装Homebrew（如未安装）
+### 1. 安装Python环境管理器
+
+#### 方法一：安装miniforge（推荐）
 ```bash
+# 下载miniforge安装脚本
+curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+
+# 运行安装脚本
+bash Miniforge3-$(uname)-$(uname -m).sh
+
+# 初始化shell环境
+source ~/.zshrc  # 或 source ~/.bash_profile
+```
+
+#### 方法二：使用Homebrew安装Python
+```bash
+# 安装Homebrew（如未安装）
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# 安装Python
+brew install python@3.11
 ```
 
-### 2. 添加Pantheon-CLI仓库
+### 2. 验证Python环境
 ```bash
-brew tap pantheon-cli/tap
+python3 --version
+# 应显示Python 3.10+
 ```
 
-### 3. 安装Pantheon-CLI
-```bash
-brew install pantheon-cli
-```
+## 安装Pantheon-CLI
 
-### 4. 验证安装
-```bash
-pantheon --version
-```
+### 方法一：使用conda（推荐）
 
-## 方法二：使用pip安装
+1. **创建专用环境**
+   ```bash
+   conda create -n pantheon python=3.11
+   conda activate pantheon
+   ```
+
+2. **安装Pantheon-CLI**
+   ```bash
+   pip install pantheon-cli
+   ```
+
+3. **验证安装**
+   ```bash
+   pantheon-cli --version
+   ```
+
+### 方法二：使用pip安装
 
 ### 1. 确保Python已安装
 ```bash

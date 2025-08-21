@@ -2,55 +2,93 @@
 
 在Linux系统上安装Pantheon-CLI的详细步骤。
 
-## Ubuntu/Debian系统
+## 准备工作
 
-### 方法一：使用APT包管理器
+### 1. 安装Python环境管理器
 
+#### Ubuntu/Debian系统
+
+**方法一：安装miniforge（推荐）**
 ```bash
-# 添加Pantheon-CLI仓库
-wget -qO - https://pantheon-cli.io/apt/pubkey.gpg | sudo apt-key add -
-echo "deb https://pantheon-cli.io/apt stable main" | sudo tee /etc/apt/sources.list.d/pantheon.list
+# 下载miniforge
+curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
 
+# 安装
+bash Miniforge3-$(uname)-$(uname -m).sh
+
+# 重新加载shell配置
+source ~/.bashrc
+```
+
+**方法二：使用APT安装Python**
+```bash
 # 更新包列表
 sudo apt update
 
-# 安装Pantheon-CLI
-sudo apt install pantheon-cli
+# 安装Python 3.11
+sudo apt install python3.11 python3.11-pip python3.11-venv
+
+# 设置默认Python版本（可选）
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
 ```
 
-### 方法二：使用DEB包
+#### CentOS/RHEL/Fedora系统
 
+**安装miniforge（推荐）**
 ```bash
-# 下载最新版本
-wget https://pantheon-cli.io/releases/latest/pantheon-cli.deb
+# 下载miniforge
+curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
 
 # 安装
-sudo dpkg -i pantheon-cli.deb
+bash Miniforge3-$(uname)-$(uname -m).sh
 
-# 修复依赖（如需要）
-sudo apt-get install -f
+# 重新加载shell配置
+source ~/.bashrc
 ```
 
-## CentOS/RHEL/Fedora系统
-
-### 方法一：使用YUM/DNF
-
+**使用系统包管理器**
 ```bash
-# 添加仓库
-sudo tee /etc/yum.repos.d/pantheon.repo << EOF
-[pantheon]
-name=Pantheon CLI
-baseurl=https://pantheon-cli.io/rpm/
-enabled=1
-gpgcheck=1
-gpgkey=https://pantheon-cli.io/rpm/pubkey.gpg
-EOF
+# CentOS/RHEL 7/8
+sudo yum install python3.11 python3.11-pip
 
-# 安装（CentOS/RHEL）
-sudo yum install pantheon-cli
+# Fedora
+sudo dnf install python3.11 python3-pip
 
-# 或使用DNF（Fedora）
-sudo dnf install pantheon-cli
+# CentOS/RHEL 9
+sudo dnf install python3.11 python3-pip
+```
+
+### 2. 验证Python环境
+```bash
+python3 --version
+# 应显示Python 3.10+
+```
+
+## 安装Pantheon-CLI
+
+### 方法一：使用conda（推荐）
+
+1. **创建专用环境**
+   ```bash
+   conda create -n pantheon python=3.11
+   conda activate pantheon
+   ```
+
+2. **安装Pantheon-CLI**
+   ```bash
+   pip install pantheon-cli
+   ```
+
+3. **验证安装**
+   ```bash
+   pantheon-cli --version
+   ```
+
+### 方法二：使用pip安装
+
+如果你有合适的Python环境：
+```bash
+pip3 install pantheon-cli
 ```
 
 ### 方法二：使用RPM包

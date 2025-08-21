@@ -4,8 +4,8 @@ import en from './locales/en'
 
 const i18n = createI18n({
   legacy: false,
-  locale: 'en',
-  fallbackLocale: 'zh',
+  locale: 'zh',
+  fallbackLocale: 'en',
   messages: {
     zh,
     en

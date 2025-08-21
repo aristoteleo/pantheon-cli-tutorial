@@ -2,38 +2,59 @@
 
 在Windows系统上安装Pantheon-CLI的详细步骤。
 
-## 方法一：使用安装程序（推荐）
+## 准备工作
 
-### 1. 下载安装程序
-访问 [Pantheon-CLI官网](https://pantheon-cli.io/download) 下载Windows安装程序。
+### 1. 安装Python环境管理器
 
-### 2. 运行安装程序
-1. 双击下载的 `pantheon-cli-setup.exe`
-2. 如果出现安全警告，点击"更多信息"→"仍要运行"
-3. 按照安装向导完成安装
+#### 方法一：安装miniforge（推荐）
+1. 访问 [miniforge releases](https://github.com/conda-forge/miniforge/releases)
+2. 下载 `Miniforge3-Windows-x86_64.exe`
+3. 运行安装程序，按默认设置安装
+4. 重启命令提示符或PowerShell
 
-### 3. 配置环境变量
-安装程序会自动配置，但如需手动配置：
-1. 右键"此电脑"→"属性"→"高级系统设置"
-2. 点击"环境变量"
-3. 在"系统变量"中找到Path，添加：
-   ```
-   C:\Program Files\Pantheon-CLI\bin
-   ```
+#### 方法二：安装Anaconda
+1. 访问 [Anaconda官网](https://www.anaconda.com/download/)
+2. 下载Windows版安装程序
+3. 运行安装程序，勾选"Add Anaconda to PATH"
+4. 完成安装后重启命令行
 
-## 方法二：使用pip安装
-
-### 1. 打开PowerShell（管理员）
-按 `Win + X`，选择"Windows PowerShell（管理员）"
-
-### 2. 安装Pantheon-CLI
+### 2. 验证Python环境
+打开Anaconda Prompt或PowerShell：
 ```powershell
-pip install pantheon-cli
+python --version
+# 应显示Python 3.10+
 ```
 
-### 3. 验证安装
+## 安装Pantheon-CLI
+
+### 方法一：使用pip安装（推荐）
+
+1. **打开Anaconda Prompt**
+   - 在开始菜单搜索"Anaconda Prompt"
+   - 或按 `Win + R`，输入 `cmd`
+
+2. **创建专用环境**（推荐）
+   ```bash
+   conda create -n pantheon python=3.11
+   conda activate pantheon
+   ```
+
+3. **安装Pantheon-CLI**
+   ```bash
+   pip install pantheon-cli
+   ```
+
+4. **验证安装**
+   ```bash
+   pantheon-cli --version
+   ```
+
+### 方法二：直接pip安装
+
+如果你已有合适的Python环境：
+
 ```powershell
-pantheon --version
+pip install pantheon-cli
 ```
 
 ## 方法三：使用Chocolatey

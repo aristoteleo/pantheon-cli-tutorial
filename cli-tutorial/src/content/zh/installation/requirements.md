@@ -6,43 +6,49 @@
 
 ### 硬件要求
 - **处理器**：64位处理器，建议Intel i5或AMD Ryzen 5以上
-- **内存**：最少8GB RAM，建议16GB以上
-- **存储**：至少10GB可用空间
-- **网络**：安装时需要互联网连接
+- **内存**：最少8GB RAM，建议16GB以上（数据科学工作负载需要更多内存）
+- **存储**：至少20GB可用空间（包含Python环境和数据存储）
+- **网络**：安装时需要稳定的互联网连接
 
 ### 操作系统
 - **Windows**：Windows 10 (1903+) 或 Windows 11
-- **macOS**：macOS 10.15 (Catalina) 或更高版本
-- **Linux**：Ubuntu 20.04+, CentOS 8+, Debian 10+
+- **macOS**：macOS 10.14 或更高版本
+- **Linux**：Ubuntu 18.04+, CentOS 7+, Debian 10+, Fedora 28+
 
 ## 软件依赖
 
-### 必需依赖
-1. **Python 3.8+**
+### 核心依赖
+1. **Python 3.10+**（重要：必须是Python 3.10或更高版本）
    ```bash
    python --version  # 检查Python版本
+   python3 --version # 在某些系统上使用python3
    ```
 
-2. **pip 20.0+**
-   ```bash
-   pip --version  # 检查pip版本
-   ```
+2. **包管理器**
+   - **conda**（推荐）：miniforge, Anaconda, 或 miniconda
+   - **pip**：如果不使用conda环境
 
-3. **Git 2.0+**（用于版本控制）
-   ```bash
-   git --version  # 检查Git版本
-   ```
+### 推荐的Python环境管理
+Pantheon-CLI依赖本地Python环境，推荐使用以下任一环境管理工具：
 
-### 可选依赖
+#### miniforge（推荐）
+```bash
+# 下载并安装miniforge
+# https://github.com/conda-forge/miniforge
+```
 
-#### 数据库支持
-- PostgreSQL 12+ （用于大规模数据处理）
-- MySQL 8.0+ （可选数据存储）
-- SQLite 3.30+ （默认内置）
+#### Anaconda
+```bash
+# 下载并安装Anaconda
+# https://www.anaconda.com/
+```
 
-#### 可视化增强
-- Node.js 14+ （交互式图表）
-- Chrome/Firefox （Web界面）
+#### miniconda
+```bash
+# 下载并安装miniconda  
+# https://docs.conda.io/en/latest/miniconda.html
+```
+
 
 ## 环境准备
 
