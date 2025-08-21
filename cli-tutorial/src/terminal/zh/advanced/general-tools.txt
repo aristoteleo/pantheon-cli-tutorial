@@ -1,0 +1,337 @@
+## Shell命令执行演示
+$ 运行ls -la查看当前目录
+执行shell命令: ls -la
+
+total 64
+drwxr-xr-x  12 user  staff   384 Jan 15 10:30 .
+drwxr-xr-x   8 user  staff   256 Jan 15 09:15 ..
+-rw-r--r--   1 user  staff  2048 Jan 15 10:25 analysis.py
+-rw-r--r--   1 user  staff  4096 Jan 15 10:30 data.csv
+drwxr-xr-x   5 user  staff   160 Jan 15 09:45 results/
+
+✓ 命令执行成功
+
+$ 创建新shell并运行Python脚本
+创建新shell会话...
+✓ Shell ID: shell_001
+
+运行命令: python analysis.py --input data.csv
+正在执行分析脚本...
+加载数据: 1000行 × 15列
+数据预处理完成
+运行统计分析...
+生成可视化图表...
+✓ 分析完成，结果保存至 results/
+
+## 文件操作演示
+$ 显示当前项目的文件树结构
+执行 list_file_tree...
+
+project/
+├── data/
+│   ├── raw/
+│   │   ├── sample1.csv
+│   │   └── sample2.csv
+│   └── processed/
+│       └── merged_data.csv
+├── scripts/
+│   ├── preprocess.py
+│   ├── analysis.py
+│   └── visualize.py
+├── results/
+│   ├── figures/
+│   └── tables/
+├── config.yaml
+└── README.md
+
+✓ 文件树生成完成
+
+$ 批量移动CSV文件到results目录
+创建目录: results/csv_files/
+✓ 目录创建成功
+
+查找所有CSV文件...
+找到 5 个CSV文件
+
+移动文件:
+- moving data1.csv → results/csv_files/
+- moving data2.csv → results/csv_files/
+- moving summary.csv → results/csv_files/
+- moving output.csv → results/csv_files/
+- moving report.csv → results/csv_files/
+
+✓ 所有文件移动完成
+
+## 文本搜索和编辑演示
+$ 在所有Python文件中搜索"TODO"标记
+执行 grep "TODO" --pattern "*.py"...
+
+scripts/preprocess.py:
+  Line 45: # TODO: 添加异常值处理
+  Line 89: # TODO: 优化内存使用
+
+scripts/analysis.py:
+  Line 23: # TODO: 实现并行计算
+  Line 156: # TODO: 添加更多统计检验
+
+scripts/visualize.py:
+  Line 67: # TODO: 改进配色方案
+
+✓ 找到 5 个匹配项
+
+$ 编辑config.yaml，在第10行添加新配置
+读取文件 config.yaml...
+当前第10行内容: "  threads: 4"
+
+执行 insert_at_line...
+插入内容: "  cache_enabled: true"
+
+✓ 配置已添加到第11行
+
+## Python代码执行演示
+$ 运行Python代码进行数据分析
+执行 run_python_code:
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 加载数据
+df = pd.read_csv('data.csv')
+print(f"数据形状: {df.shape}")
+
+# 基础统计
+stats = df.describe()
+print("\n统计摘要:")
+print(stats)
+
+# 相关性分析
+corr = df.corr()
+print(f"\n最高相关性: {corr.unstack().sort_values()[-2]:.3f}")
+
+# 生成图表
+plt.figure(figsize=(10, 6))
+df['value'].hist(bins=30)
+plt.title('数据分布')
+plt.savefig('distribution.png')
+print("\n图表已保存: distribution.png")
+```
+
+输出:
+数据形状: (1000, 8)
+
+统计摘要:
+       value     score      time
+count  1000.0   1000.0    1000.0
+mean   50.234   75.123    12.456
+std    15.678   12.345     3.234
+min    10.123   45.678     5.123
+25%    40.234   67.890     10.234
+50%    50.456   75.234     12.345
+75%    60.123   82.456     14.567
+max    95.678   98.765     22.345
+
+最高相关性: 0.856
+
+图表已保存: distribution.png
+
+✓ Python代码执行完成
+
+## R代码执行演示
+$ 使用R进行统计分析
+执行 run_r_code:
+```r
+# 加载数据
+data <- read.csv("data.csv")
+cat("数据维度:", dim(data), "\n")
+
+# t检验
+group1 <- data$value[data$group == "A"]
+group2 <- data$value[data$group == "B"]
+t_result <- t.test(group1, group2)
+print(t_result)
+
+# 线性回归
+model <- lm(value ~ score + time, data = data)
+summary(model)
+```
+
+输出:
+数据维度: 1000 8
+
+	Welch Two Sample t-test
+
+data:  group1 and group2
+t = 3.456, df = 498.23, p-value = 0.0006
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 2.123 7.890
+sample estimates:
+mean of x mean of y 
+   52.345    47.234
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  10.234     2.345   4.365  1.5e-05 ***
+score         0.523     0.045  11.234  < 2e-16 ***
+time          1.234     0.123  10.032  < 2e-16 ***
+
+✓ R分析完成
+
+## Jupyter Notebook操作演示
+$ 创建新的分析notebook
+执行 create_notebook "analysis.ipynb"...
+✓ Notebook创建成功
+
+添加标题单元格...
+✓ 添加Markdown单元格: "# 数据分析报告"
+
+添加代码单元格...
+✓ 添加代码: 数据加载和预处理
+
+添加可视化单元格...
+✓ 添加代码: 图表生成
+
+应用机器学习模板...
+执行 add_notebook_template...
+✓ 添加模板: 包含5个标准分析步骤
+
+Notebook结构:
+1. [Markdown] 标题和介绍
+2. [Code] 导入库
+3. [Code] 数据加载
+4. [Code] 数据探索
+5. [Code] 特征工程
+6. [Code] 模型训练
+7. [Code] 结果评估
+8. [Markdown] 结论
+
+✓ Notebook准备完成
+
+## PDF处理演示
+$ 读取paper.pdf提取方法部分
+执行 read_pdf "paper.pdf"...
+✓ PDF加载成功 (32页)
+
+搜索"Methods"部分...
+找到方法部分: 第8-12页
+
+提取的内容:
+"""
+3. Methods
+
+3.1 Data Collection
+We collected samples from 50 participants...
+
+3.2 Experimental Design
+The experiment consisted of three phases...
+
+3.3 Statistical Analysis
+All analyses were performed using R version 4.2...
+"""
+
+✓ 方法部分提取完成
+
+## Web内容获取演示
+$ 参考 https://docs.scipy.org/doc/scipy/tutorial/stats.html
+执行 web_fetch...
+获取URL内容...
+✓ 成功获取网页 (15,234 字符)
+
+解析内容...
+提取的关键信息:
+- 统计函数概览
+- 概率分布
+- 假设检验方法
+- 示例代码
+
+基于文档生成示例代码:
+```python
+from scipy import stats
+
+# 正态性检验
+statistic, pvalue = stats.normaltest(data)
+
+# t检验
+t_stat, p_val = stats.ttest_ind(sample1, sample2)
+
+# 线性回归
+slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+```
+
+✓ 文档内容已提取并生成代码示例
+
+## Todo任务管理演示
+$ 创建数据分析工作流
+执行 add_todo...
+
+添加任务列表:
+1. 数据获取和清洗
+2. 探索性数据分析
+3. 特征工程
+4. 模型选择和训练
+5. 模型评估
+6. 结果可视化
+7. 生成报告
+
+✓ 7个任务已添加
+
+$ 显示当前任务状态
+执行 show_todos...
+
+╭─────────────────────────────────────────╮
+│ # │ 任务              │ 状态     │ 进度 │
+├─────────────────────────────────────────┤
+│ 1 │ 数据获取和清洗    │ 进行中   │ 60%  │
+│ 2 │ 探索性数据分析    │ 待处理   │ 0%   │
+│ 3 │ 特征工程          │ 待处理   │ 0%   │
+│ 4 │ 模型选择和训练    │ 待处理   │ 0%   │
+│ 5 │ 模型评估          │ 待处理   │ 0%   │
+│ 6 │ 结果可视化        │ 待处理   │ 0%   │
+│ 7 │ 生成报告          │ 待处理   │ 0%   │
+╰─────────────────────────────────────────╯
+
+$ 完成当前任务并开始下一个
+执行 mark_task_done...
+✓ 任务1已完成: 数据获取和清洗
+
+执行 work_on_next_todo...
+开始任务2: 探索性数据分析
+
+自动执行:
+- 加载清洗后的数据
+- 计算描述性统计
+- 生成分布图
+- 相关性分析
+
+✓ 任务2进行中...
+
+## 工具组合执行演示
+$ 执行完整的文献处理流程
+开始组合工具执行...
+
+步骤 1: 列出PDF文件
+执行 glob "papers/*.pdf"...
+找到 12 个PDF文件
+
+步骤 2: 批量读取PDF
+处理文件 1/12: paper1.pdf
+提取标题、摘要、方法...
+处理文件 2/12: paper2.pdf
+提取标题、摘要、方法...
+[...]
+
+步骤 3: 搜索特定方法
+执行 search_in_file "machine learning"...
+找到 8 篇包含相关方法的论文
+
+步骤 4: 创建综述文档
+执行 create_file "literature_review.md"...
+写入综述内容...
+
+步骤 5: 生成引用列表
+格式化引用...
+添加到文档...
+
+✓ 文献处理流程完成！
+输出: literature_review.md (5,234 words)

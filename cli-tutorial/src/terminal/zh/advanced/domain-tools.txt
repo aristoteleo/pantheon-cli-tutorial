@@ -1,0 +1,118 @@
+🧬 特定领域工具调用演示
+
+# 生物信息学工具集展示
+
+## RNA-seq上游分析
+$ /bio rna init
+✅ 初始化RNA-seq项目结构
+📁 创建目录: fastq/, qc/, alignment/, quantification/
+
+$ /bio rna upstream ./rna_data
+🔍 检测物种和基因组资源...
+📊 开始RNA-seq上游分析流程
+
+Phase 0: 项目初始化和依赖检查
+✅ 检查工具: fastqc, STAR, featureCounts
+✅ 设置基因组资源
+
+Phase 1: 质量控制
+🧪 运行FastQC分析...
+📈 生成质量报告: qc/fastqc_report.html
+
+Phase 2: 序列比对
+🎯 STAR基因组比对...
+📊 映射率: 85.3% (良好)
+
+Phase 3: 基因定量
+📊 featureCounts基因定量...
+✅ 生成表达矩阵: counts_matrix.txt
+
+## ATAC-seq上游分析
+$ /bio atac init
+✅ 初始化ATAC-seq项目结构
+📁 创建染色质可及性分析环境
+
+$ /bio atac upstream ./atac_data
+🔍 ATAC-seq特异性分析开始...
+
+Phase 1: 质量控制和预处理
+📊 FastQC质控检查
+✂️ 接头序列修剪
+
+Phase 2: 基因组比对
+🎯 Bowtie2比对 (ATAC优化参数)
+🧹 BAM文件过滤和去重
+
+Phase 3: 峰检测
+📈 MACS2峰调用...
+🔍 检测到 15,432 个可及性峰
+📊 生成覆盖度轨迹
+
+## 单细胞RNA-seq分析
+$ /bio scrna init
+✅ 单细胞分析环境准备
+🧬 omicverse集成就绪
+
+$ /bio scrna analysis ./sc_data.h5ad
+📊 加载单细胞数据: (5000 cells, 20000 genes)
+
+Phase 1: 质量控制
+🔍 细胞质控指标计算...
+🧹 过滤低质量细胞: 4876 cells retained
+
+Phase 2: 数据预处理
+📊 标准化和特征选择
+📈 主成分分析完成
+
+Phase 3: 细胞聚类
+🎯 发现 8 个细胞群
+📊 UMAP降维可视化
+
+Phase 4: 细胞类型注释
+🤖 自动细胞类型注释
+✅ 识别: T细胞, B细胞, 巨噬细胞等
+
+## 分子对接分析 (NEW VERSION)
+$ /bio dock init
+✅ 分子对接环境初始化
+🧪 Python vina API 就绪
+
+$ dock.Dock_Workflow("check_dependencies")
+📦 检查依赖: meeko, vina
+✅ 所有依赖已安装
+
+$ dock.Dock_Workflow("prepare_receptor")
+🧬 蛋白质受体预处理...
+📝 生成脚本: scripts/prepare_receptor.py
+⚡ 转换 PDB → PDBQT 格式
+
+$ dock.Dock_Workflow("batch_docking")
+🎯 批量分子对接执行...
+📊 对接评分: -8.5 kcal/mol (强结合)
+📈 生成20个结合构象
+
+Analysis Complete:
+🏆 Top binding pose: -8.5 kcal/mol
+🔬 关键相互作用: 氢键 × 3, 疏水接触 × 5
+📊 结合位点: ASP123, TYR456, PHE789
+
+## 空间转录组学分析
+$ /bio spatial init
+✅ 空间组学分析准备
+📍 高分辨率细胞级分析
+
+$ /bio spatial bin2cell ./spatial_data
+🎯 Bin2Cell细胞分割...
+📊 检测到 2,847 个细胞
+🗺️ 空间表达模式识别
+
+## 工作流特点展示
+✅ TODO管理系统 - 自动化任务清单
+🔄 持久化状态 - 变量保持和内存优化
+🔍 依赖检查 - 自动安装和配置
+⚡ 自动化执行 - 无需用户确认
+
+Current Status: All bioinformatics workflows ready
+Available: RNA-seq, ATAC-seq, scRNA-seq, Molecular Docking, Spatial
+Memory: Variables persistent across sessions
+Mode: Production-ready analysis environment

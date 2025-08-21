@@ -46,14 +46,35 @@ navigation:
     children:
       - path: /advanced-usage
         key: advancedOverview
-      - path: /advanced/scripting
-        key: advancedScripting
-      - path: /advanced/pipes
-        key: advancedPipes
-      - path: /advanced/regex
-        key: advancedRegex
-      - path: /advanced/automation
-        key: advancedAutomation
+      - path: /advanced/general-tools
+        key: advancedGeneralTools
+      - path: /advanced/domain-tools
+        key: advancedDomainTools
+      - path: /advanced/tool-details
+        key: advancedToolDetails
+  
+  - key: realCases
+    children:
+      - path: /cases/social-behavior
+        key: caseSocialBehavior
+      - path: /cases/customs-finance
+        key: caseCustomsFinance
+      - path: /cases/scrna-complex
+        key: caseScRnaComplex
+      - path: /cases/scllm
+        key: caseScLlm
+      - path: /cases/hd-10x
+        key: caseHd10x
+      - path: /cases/atac-upstream
+        key: caseAtacUpstream
+      - path: /cases/rna-upstream
+        key: caseRnaUpstream
+      - path: /cases/mixed-python-r
+        key: caseMixedPythonR
+      - path: /cases/molecular-docking
+        key: caseMolecularDocking
+      - path: /cases/seurat-llm-annotation
+        key: caseSeuratLlmAnnotation
   
   - key: troubleshooting
     children:
