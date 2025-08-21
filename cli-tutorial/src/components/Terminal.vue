@@ -444,6 +444,7 @@ const truncateIfNeeded = (content) => {
   color: var(--text-primary);
   font-weight: 500;
   word-break: break-all;
+  font-family: 'Courier New', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', monospace;
 }
 
 .output-block {
@@ -456,7 +457,7 @@ const truncateIfNeeded = (content) => {
   white-space: pre-wrap;
   word-wrap: break-word;
   margin: 0;
-  font-family: inherit;
+  font-family: 'Courier New', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', monospace;
   line-height: 1.5;
   max-width: 100%;
   overflow-x: auto;
@@ -604,7 +605,7 @@ const truncateIfNeeded = (content) => {
 
 .default-content {
   color: var(--text-primary);
-  font-family: 'Courier New', monospace;
+  font-family: 'Courier New', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', monospace;
   font-size: 14px;
   line-height: 1.4;
   white-space: pre-wrap;

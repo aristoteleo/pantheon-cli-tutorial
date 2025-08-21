@@ -1,264 +1,87 @@
 ## Python编程演示
-$ import scanpy as sc
-$ import pandas as pd
-$ import numpy as np
-$ import matplotlib.pyplot as plt
+$ %print('Hello World')
+Executing Python: print('Hello World')
+Hello World
+None
 
-模块导入完成
-- scanpy: 1.9.3 (单细胞分析)
-- pandas: 2.0.3 (数据处理)
-- numpy: 1.24.3 (数值计算)  
-- matplotlib: 3.7.2 (可视化)
+$ %a=1
+None 
 
-$ # 加载和预处理数据
-$ adata = sc.read_h5ad('data.h5ad')
-$ print(f"数据维度: {adata.shape}")
-数据维度: (3000, 20000)
+$ %print(a)
+1
 
-$ # 计算质控指标
-$ adata.var['mt'] = adata.var_names.str.startswith('MT-')
-$ sc.pp.calculate_qc_metrics(adata, percent_top=None, 
-                            log1p=False, inplace=True)
-$ print("质控指标计算完成")
-质控指标计算完成
+## R编程演示
 
-$ # 可视化质控指标
-$ sc.pl.violin(adata, ['n_genes_by_counts', 'total_counts', 
-                      'pct_counts_mt'],
-               jitter=0.4, multi_panel=True)
-正在生成质控小提琴图...
-✓ 图已保存: figures/qc_violin.pdf
+$ >print('Hello World')
 
-## R语言集成演示
-$ # 现在切换到R进行Seurat分析
-$ library(Seurat)
-$ library(dplyr)
+Starting R execution...
+Creating new R interpreter...
+R execution completed successfully
 
-Loading required package: Seurat
-Loading required package: dplyr
-✓ R包加载完成
+R version 4.4.2 (2024-10-31) -- "Pile of Leaves"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
 
-$ # 创建Seurat对象
-$ pbmc <- CreateSeuratObject(counts = pbmc.data, 
-                            project = "pbmc3k", 
-                            min.cells = 3, 
-                            min.features = 200)
-An object of class Seurat 
-13714 features across 2700 samples within 1 assay 
-Active assay: RNA (13714 features, 0 variable features)
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
 
-$ # 数据归一化和缩放
-$ pbmc <- NormalizeData(pbmc)
-$ pbmc <- FindVariableFeatures(pbmc, selection.method = "vst")
-$ pbmc <- ScaleData(pbmc, features = rownames(pbmc))
+  Natural language support but running in an English locale
 
-Normalizing layer: counts
-Finding variable features for layer counts
-Centering and scaling data matrix
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
 
-$ # 主成分分析
-$ pbmc <- RunPCA(pbmc, features = VariableFeatures(object = pbmc))
-Computing nearest neighbor graph
-Computing SNN
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
 
-$ # 聚类分析
-$ pbmc <- FindNeighbors(pbmc, dims = 1:10)  
-$ pbmc <- FindClusters(pbmc, resolution = 0.5)
-Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
 
-Found 9 clusters
+[1] "Hello World"
 
-$ # UMAP降维可视化
-$ pbmc <- RunUMAP(pbmc, dims = 1:10)
-$ DimPlot(pbmc, reduction = "umap")
-✓ UMAP图已生成
+$ > a <- 1
 
-## Julia高性能计算演示
-$ # 切换到Julia进行数值计算
-$ using LinearAlgebra, Statistics
-$ using Random, Distributions
+Starting R execution...
+R execution completed successfully
+[1] 1
 
-Julia环境已初始化
-- LinearAlgebra: 线性代数计算
-- Statistics: 统计分析
-- 高性能数值计算已就绪
+$ > a 
 
-$ # 生成大规模模拟数据
-$ n_cells = 10000
-$ n_genes = 5000  
-$ expression_matrix = rand(Normal(0, 1), n_genes, n_cells)
-$ println("模拟表达矩阵: $(size(expression_matrix))")
-模拟表达矩阵: (5000, 10000)
+Starting R execution...
+R execution completed successfully
+[1] 1
 
-$ # 高效计算基因间相关性
-$ @time cor_matrix = cor(expression_matrix)
-  0.892847 seconds (12 allocations: 763.016 MiB)
-5000×5000 Matrix{Float64}
+## Julia编程演示
 
-$ # 主成分分析
-$ using MultivariateStats
-$ @time pca_result = fit(PCA, expression_matrix; maxoutdim=50)
-  0.234156 seconds (45 allocations: 228.882 MiB)
-PCA(indim = 5000, outdim = 50, principalratio = 0.9876)
+$ ]println('Hello World')
+Creating new Julia interpreter...
+None
+Hello World
 
-$ # 聚类分析
-$ using Clustering
-$ @time clusters = kmeans(pca_result.proj, 8)
-  0.045123 seconds (1,245 allocations: 4.321 MiB)  
-✓ Julia高性能计算展示完成
+$ ]a=1
+None
+1
 
-## 混合编程演示
-$ # Python: 加载实际数据
-$ import scanpy as sc
-$ adata = sc.read_h5ad('single_cell_data.h5ad')
-$ X_python = adata.X.toarray()
-$ print(f"Python数据: {X_python.shape}")
-Python数据: (3000, 2000)
+$ ]a
+None 
+1
 
-$ # R: 进行差异表达分析  
-$ library(DESeq2)
-$ count_matrix <- py$X_python
-$ dds <- DESeqDataSetFromMatrix(
-    countData = count_matrix,
-    colData = data.frame(condition = rep(c("A", "B"), each = 1500)),
-    design = ~ condition
-  )
-$ dds <- DESeq(dds)
-$ results <- results(dds)
-✓ DESeq2差异分析完成
+## Shell命令演示
 
-$ # Julia: 高性能统计检验
-$ using HypothesisTests, StatsBase
-$ python_data = py"X_python"
-$ group1 = python_data[:, 1:1500]
-$ group2 = python_data[:, 1501:3000]
-$ 
-$ # 对每个基因进行t检验
-$ pvals = [pvalue(UnequalVarianceTTest(group1[i,:], group2[i,:])) 
-          for i in 1:2000]
-$ println("完成 $(length(pvals)) 个基因的统计检验")
-完成 2000 个基因的统计检验
+$ !pwd
+Executing: pwd
+/Users/fernandozeng/Desktop/analysis/pantheon
 
-$ # 回到Python: 可视化结果
-$ import matplotlib.pyplot as plt
-$ import seaborn as sns
-$ # 获取Julia计算的p值
-$ pvals_py = julia.eval('pvals')
-$ # 绘制p值分布直方图
-$ plt.figure(figsize=(10, 6))
-$ plt.hist(pvals_py, bins=50, alpha=0.7)
-$ plt.xlabel('P-values')
-$ plt.ylabel('Frequency')  
-$ plt.title('Distribution of P-values from Julia t-tests')
-$ plt.savefig('pvalue_distribution.pdf')
-✓ 混合编程分析完成，结果已可视化
+$ !cat README.md | head -n 10
+... 
+Executing: cat README.md | head -n 10
+<div align="center">
+  <h1> Pantheon Toolsets </h1>
 
-## Shell命令集成演示
-$ # 使用生物信息学工具进行序列分析
-$ fastp -i sample_R1.fastq -I sample_R2.fastq \
-        -o clean_R1.fastq -O clean_R2.fastq \
-        --html fastp_report.html
-Read1 before filtering:
-total reads: 1000000
-total bases: 150000000
-Q20 bases: 142500000 (95.00%)
-Q30 bases: 135000000 (90.00%)
+  <p> Distributed toolsets for Pantheon Agents. </p>
 
-✓ 质控完成，生成清理后的测序数据
-
-$ # STAR比对到参考基因组
-$ STAR --runMode alignReads \
-       --genomeDir /ref/genome_index \
-       --readFilesIn clean_R1.fastq clean_R2.fastq \
-       --outFileNamePrefix sample_ \
-       --outSAMtype BAM SortedByCoordinate
-Started mapping
-Mapping speed: 5.2M reads/minute  
-Uniquely mapped reads: 85.3%
-✓ 序列比对完成
-
-$ # 使用kallisto进行转录本定量
-$ kallisto quant -i transcripts.idx \
-                 -o kallisto_output \
-                 clean_R1.fastq clean_R2.fastq
-[quant] fragment length distribution will be estimated from the data
-[quant] fragment length distribution has mean: 180, sd: 20  
-[quant] running in paired-end mode
-[quant] processed 1,000,000 reads, 950,000 pseudoaligned
-✓ 转录本定量完成
-
-## 错误处理和调试演示
-$ # 故意产生一个错误
-$ result = undefined_variable + 5
-NameError: name 'undefined_variable' is not defined
-
-🔍 智能错误诊断:
-- 错误类型: NameError  
-- 问题: 变量 'undefined_variable' 未定义
-- 建议修复:
-  1. 检查变量名拼写是否正确
-  2. 确认变量已在使用前定义
-  3. 可能的修复: undefined_variable = 0
-
-$ # 修复错误
-$ defined_variable = 10
-$ result = defined_variable + 5
-$ print(f"计算结果: {result}")
-计算结果: 15
-
-$ # 调试模式演示
-$ %debug
-> /path/to/analysis.py(45)calculate_metrics()
-     44     for i in range(len(data)):
----> 45         metric = data[i] / total
-     46         metrics.append(metric)
-
-ipdb> p data[i]
-125.6
-ipdb> p total  
-0
-ipdb> # 发现除零错误的原因
-ipdb> c
-
-🐛 调试信息:
-- 在第45行发现除零错误
-- total变量值为0，导致除法运算失败
-- 建议添加条件检查避免除零
-
-$ # 优化后的代码
-$ def safe_calculate_metrics(data, total):
-$     if total == 0:
-$         return [0] * len(data)
-$     return [x / total for x in data]
-$ 
-$ metrics = safe_calculate_metrics(data, total)
-✓ 错误已修复，代码运行正常
-
-## 性能优化演示
-$ # 使用向量化操作替代循环
-$ # 原始慢速代码
-$ import time
-$ start = time.time()
-$ result_slow = []
-$ for i in range(100000):
-$     result_slow.append(np.sin(i * 0.01))
-$ slow_time = time.time() - start
-$ print(f"循环方法耗时: {slow_time:.4f}秒")
-循环方法耗时: 0.3247秒
-
-$ # 优化的向量化代码  
-$ start = time.time()
-$ x = np.arange(100000) * 0.01
-$ result_fast = np.sin(x)
-$ fast_time = time.time() - start
-$ print(f"向量化方法耗时: {fast_time:.4f}秒")
-向量化方法耗时: 0.0023秒
-
-$ print(f"性能提升: {slow_time/fast_time:.1f}倍")
-性能提升: 141.2倍
-
-💡 性能优化建议:
-- 使用NumPy向量化操作替代Python循环
-- 避免重复计算，使用缓存机制
-- 对大数据集考虑使用Dask或多线程并行
-- 内存密集型操作考虑使用Julia或Cython
+  <p>
+    <a href="https://github.com/aristoteleo/pantheon-toolsets/actions/workflows/test.yml">
+        <img src="https://github.com/aristoteleo/pantheon-toolsets/actions/workflows/test.yml/badge.svg" alt="Build Status">
+    </a>
+    <a href="https://pypi.org/project/pantheon-toolsets/">

@@ -1,32 +1,14 @@
 # 高级用法
 
-## 配置文件
+Pantheon-CLI是一个解决数据科学的端到端方案，因此，我们除了对话分析外，我们还内置了一系列工具。这些工具具有可扩展性，用户可以编写自己的工具来执行复杂的自动化分析。此外，我们可以使用Todo来定义自动化分析流程，这样下次遇到相同的分析，就不用继续重复一遍又一遍的对话了。
 
-创建 `.cli-config.json` 文件：
+## 泛用工具调用
 
-```json
-{
-  "defaultProject": "my-project",
-  "autoSave": true,
-  "theme": "dark"
-}
-```
+目前，Pantheon-CLI内置了超过60+的工具，我们通过组合这些工具，可以最大程度地达到我们的分析目的。例如，我们可以让它先读取一个网页教程的内容，然后再执行分析。我们也可以让它读取论文pdf的内容，然后执行分析等。
 
-## 管道和重定向
+## 特定领域工具调用
 
-```bash
-# 管道
-my-cli list | grep "project"
+目前，Pantheon-CLI内置了RNA-seq上游分析，ATAC-seq上游分析，scRNA-seq的细胞注释，10x-HD的细胞分割，小分子与蛋白的对接。
 
-# 重定向输出
-my-cli status > output.txt
-```
 
-## 脚本编写
 
-```bash
-#!/bin/bash
-my-cli init my-project
-my-cli config --set autoSave=true
-my-cli run my-project
-```
