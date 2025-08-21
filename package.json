@@ -6,8 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "vite",
+    "clean": "rm -rf dist node_modules/.vite"
   },
+  "packageManager": "pnpm@8.15.0",
   "dependencies": {
     "@vueuse/core": "^13.7.0",
     "js-yaml": "^4.1.0",
