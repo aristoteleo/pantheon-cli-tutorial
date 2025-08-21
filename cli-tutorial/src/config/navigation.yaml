@@ -1,0 +1,63 @@
+navigation:
+  - key: introduction
+    children:
+      - path: /
+        key: introOverview
+      - path: /intro/what-is-cli
+        key: introWhatIs
+      - path: /intro/why-cli
+        key: introWhy
+      - path: /intro/getting-started
+        key: introGettingStarted
+  
+  - key: installation
+    children:
+      - path: /installation
+        key: installOverview
+      - path: /installation/requirements
+        key: installRequirements
+      - path: /installation/windows
+        key: installWindows
+      - path: /installation/macos
+        key: installMacos
+      - path: /installation/linux
+        key: installLinux
+      - path: /installation/verify
+        key: installVerify
+  
+  - key: basicCommands
+    children:
+      - path: /basic-commands
+        key: basicOverview
+      - path: /basic/navigation
+        key: basicNavigation
+      - path: /basic/file-operations
+        key: basicFileOps
+      - path: /basic/text-editing
+        key: basicTextEdit
+      - path: /basic/permissions
+        key: basicPermissions
+  
+  - key: advancedUsage
+    children:
+      - path: /advanced-usage
+        key: advancedOverview
+      - path: /advanced/scripting
+        key: advancedScripting
+      - path: /advanced/pipes
+        key: advancedPipes
+      - path: /advanced/regex
+        key: advancedRegex
+      - path: /advanced/automation
+        key: advancedAutomation
+  
+  - key: troubleshooting
+    children:
+      - path: /troubleshooting
+        key: troubleOverview
+      - path: /trouble/common-errors
+        key: troubleCommonErrors
+      - path: /trouble/debugging
+        key: troubleDebugging
+      - path: /trouble/faq
+        key: troubleFaq
