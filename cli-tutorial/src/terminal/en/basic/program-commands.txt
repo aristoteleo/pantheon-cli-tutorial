@@ -1,0 +1,87 @@
+## Python Programming Demonstration
+$ %print('Hello World')
+Executing Python: print('Hello World')
+Hello World
+None
+
+$ %a=1
+None 
+
+$ %print(a)
+1
+
+## R Programming Demonstration
+
+$ >print('Hello World')
+
+Starting R execution...
+Creating new R interpreter...
+R execution completed successfully
+
+R version 4.4.2 (2024-10-31) -- "Pile of Leaves"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+
+[1] "Hello World"
+
+$ > a <- 1
+
+Starting R execution...
+R execution completed successfully
+[1] 1
+
+$ > a 
+
+Starting R execution...
+R execution completed successfully
+[1] 1
+
+## Julia Programming Demonstration
+
+$ ]println('Hello World')
+Creating new Julia interpreter...
+None
+Hello World
+
+$ ]a=1
+None
+1
+
+$ ]a
+None 
+1
+
+## Shell Command Demonstration
+
+$ !pwd
+Executing: pwd
+/Users/fernandozeng/Desktop/analysis/pantheon
+
+$ !cat README.md | head -n 10
+... 
+Executing: cat README.md | head -n 10
+<div align="center">
+  <h1> Pantheon Toolsets </h1>
+
+  <p> Distributed toolsets for Pantheon Agents. </p>
+
+  <p>
+    <a href="https://github.com/aristoteleo/pantheon-toolsets/actions/workflows/test.yml">
+        <img src="https://github.com/aristoteleo/pantheon-toolsets/actions/workflows/test.yml/badge.svg" alt="Build Status">
+    </a>
+    <a href="https://pypi.org/project/pantheon-toolsets/">

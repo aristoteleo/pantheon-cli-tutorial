@@ -1,0 +1,241 @@
+# Complex Single-cell RNA-seq Annotation Terminal Demonstration
+
+# Start R environment for complex single-cell analysis
+R
+
+# 1. Load necessary packages
+library(Seurat)
+library(SingleCellExperiment)
+library(scater)
+library(scran)
+library(SingleR)
+library(celldex)
+library(pheatmap)
+library(ggplot2)
+library(dplyr)
+library(patchwork)
+
+# 2. Data loading and quality control
+# Load 10x data
+data.dir <- "path/to/complex_scRNA_data/"
+expression.matrix <- Read10X(data.dir = data.dir)
+
+# Create Seurat object
+seurat.obj <- CreateSeuratObject(
+  counts = expression.matrix,
+  project = "ComplexTissue",
+  min.cells = 3,
+  min.features = 200
+)
+
+print(paste("Initial cell count:", ncol(seurat.obj)))
+print(paste("Detected gene count:", nrow(seurat.obj)))
+
+# 3. Advanced quality control metrics calculation
+# Mitochondrial genes
+seurat.obj[["percent.mt"]] <- PercentageFeatureSet(seurat.obj, pattern = "^MT-")
+
+# Ribosomal genes
+seurat.obj[["percent.rb"]] <- PercentageFeatureSet(seurat.obj, pattern = "^RP[SL]")
+
+# Hemoglobin genes
+seurat.obj[["percent.hb"]] <- PercentageFeatureSet(seurat.obj, pattern = "^HB[^(P)]")
+
+# Cell cycle genes
+s.genes <- cc.genes$s.genes
+g2m.genes <- cc.genes$g2m.genes
+seurat.obj <- CellCycleScoring(seurat.obj, s.features = s.genes, g2m.features = g2m.genes)
+
+# Complex quality control visualization
+p1 <- VlnPlot(seurat.obj, features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"), ncol = 2)
+p2 <- FeatureScatter(seurat.obj, feature1 = "nCount_RNA", feature2 = "percent.mt")
+p3 <- FeatureScatter(seurat.obj, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+
+# 4. Adaptive quality control threshold determination
+# Use MAD method to determine outliers
+qc.metrics <- seurat.obj@meta.data[,c("nFeature_RNA", "nCount_RNA", "percent.mt")]
+
+# Calculate thresholds for each metric
+thresholds <- list()
+for(metric in colnames(qc.metrics)) {
+  median_val <- median(qc.metrics[[metric]])
+  mad_val <- mad(qc.metrics[[metric]])
+  
+  if(metric == "percent.mt") {
+    # Mitochondrial gene upper limit
+    thresholds[[metric]] <- c(0, median_val + 3 * mad_val)
+  } else {
+    # Feature and UMI count upper and lower limits
+    thresholds[[metric]] <- c(
+      max(200, median_val - 3 * mad_val),
+      median_val + 3 * mad_val
+    )
+  }
+}
+
+print("Adaptive quality control thresholds:")
+print(thresholds)
+
+# 5. Cell filtering
+seurat.obj <- subset(seurat.obj, 
+  subset = nFeature_RNA > thresholds$nFeature_RNA[1] & 
+          nFeature_RNA < thresholds$nFeature_RNA[2] & 
+          nCount_RNA < thresholds$nCount_RNA[2] &
+          percent.mt < thresholds$percent.mt[2]
+)
+
+print(paste("Cell count after filtering:", ncol(seurat.obj)))
+
+# 6. Advanced normalization methods
+# Use SCTransform for normalization
+seurat.obj <- SCTransform(seurat.obj, 
+                         vars.to.regress = c("percent.mt", "S.Score", "G2M.Score"),
+                         verbose = FALSE)
+
+# 7. Multiple dimensionality reduction analysis
+# PCA
+seurat.obj <- RunPCA(seurat.obj, features = VariableFeatures(object = seurat.obj))
+
+# Determine optimal PC number
+pct <- seurat.obj[["pca"]]@stdev / sum(seurat.obj[["pca"]]@stdev) * 100
+cumu <- cumsum(pct)
+co1 <- which(cumu > 90 & pct < 5)[1]
+co2 <- sort(which((pct[1:length(pct) - 1] - pct[2:length(pct)]) > 0.1), decreasing = T)[1] + 1
+pcs <- min(co1, co2)
+print(paste("Selected PC number:", pcs))
+
+# 8. Multiple clustering strategy comparison
+# Standard Louvain clustering
+seurat.obj <- FindNeighbors(seurat.obj, dims = 1:pcs)
+
+# Test multiple resolutions
+resolutions <- seq(0.1, 1.0, by = 0.1)
+for(res in resolutions) {
+  seurat.obj <- FindClusters(seurat.obj, resolution = res)
+}
+
+# Select optimal resolution (based on silhouette score)
+library(cluster)
+sil_scores <- numeric(length(resolutions))
+for(i in seq_along(resolutions)) {
+  clusters <- seurat.obj@meta.data[[paste0("SCT_snn_res.", resolutions[i])]]
+  if(length(unique(clusters)) > 1) {
+    pca_coords <- Embeddings(seurat.obj, reduction = "pca")[, 1:pcs]
+    sil_scores[i] <- mean(silhouette(as.numeric(as.factor(clusters)), 
+                                   dist(pca_coords))[, 3])
+  }
+}
+
+optimal_res <- resolutions[which.max(sil_scores)]
+Idents(seurat.obj) <- paste0("SCT_snn_res.", optimal_res)
+
+print(paste("Optimal resolution:", optimal_res))
+print(paste("Number of clusters:", length(unique(Idents(seurat.obj)))))
+
+# 9. UMAP and tSNE visualization
+seurat.obj <- RunUMAP(seurat.obj, dims = 1:pcs)
+seurat.obj <- RunTSNE(seurat.obj, dims = 1:pcs)
+
+# Visualization comparison
+p1 <- DimPlot(seurat.obj, reduction = "umap", group.by = "ident", label = TRUE)
+p2 <- DimPlot(seurat.obj, reduction = "tsne", group.by = "ident", label = TRUE)
+p1 + p2
+
+# 10. Complex differential gene analysis
+# Use multiple statistical methods
+cluster.markers <- FindAllMarkers(seurat.obj, 
+                                 only.pos = TRUE,
+                                 min.pct = 0.25, 
+                                 logfc.threshold = 0.25,
+                                 test.use = "wilcox")
+
+# MAST method (considers cell detection rate)
+library(MAST)
+cluster.markers.mast <- FindAllMarkers(seurat.obj, 
+                                      test.use = "MAST",
+                                      only.pos = TRUE,
+                                      min.pct = 0.25)
+
+# 11. Multiple cell type annotation strategies
+# SingleR automatic annotation
+ref.data <- celldex::HumanPrimaryCellAtlasData()
+sce <- as.SingleCellExperiment(seurat.obj)
+predictions <- SingleR(test = sce, ref = ref.data, labels = ref.data$label.main)
+seurat.obj$SingleR.labels <- predictions$labels
+
+# Manual annotation based on marker genes
+canonical.markers <- list(
+  "T_cells" = c("CD3D", "CD3E", "CD3G"),
+  "B_cells" = c("CD79A", "CD79B", "MS4A1"),
+  "NK_cells" = c("GNLY", "NKG7", "GZMA"),
+  "Monocytes" = c("CD14", "FCGR3A", "LYZ"),
+  "DC" = c("FCER1A", "CST3", "CD1C"),
+  "Platelets" = c("PPBP", "PF4", "TUBB1")
+)
+
+# Calculate marker gene scores for each cluster
+for(cell.type in names(canonical.markers)) {
+  seurat.obj <- AddModuleScore(seurat.obj, 
+                              features = list(canonical.markers[[cell.type]]),
+                              name = paste0(cell.type, "_score"))
+}
+
+# 12. Cluster annotation and validation
+# Annotate based on marker gene scores
+cluster.annotation <- function(seurat.obj, cluster.id) {
+  cluster.cells <- WhichCells(seurat.obj, idents = cluster.id)
+  
+  scores <- sapply(names(canonical.markers), function(ct) {
+    score.name <- paste0(ct, "_score1")
+    if(score.name %in% colnames(seurat.obj@meta.data)) {
+      mean(seurat.obj@meta.data[cluster.cells, score.name])
+    } else {
+      0
+    }
+  })
+  
+  return(names(scores)[which.max(scores)])
+}
+
+# Assign cell types to each cluster
+cluster.ids <- levels(Idents(seurat.obj))
+cell.type.annotations <- sapply(cluster.ids, cluster.annotation, seurat.obj = seurat.obj)
+names(cell.type.annotations) <- cluster.ids
+
+print("Cluster annotation results:")
+print(cell.type.annotations)
+
+# Apply annotations
+new.cluster.ids <- cell.type.annotations
+names(new.cluster.ids) <- levels(seurat.obj)
+seurat.obj <- RenameIdents(seurat.obj, new.cluster.ids)
+seurat.obj$cell.type <- Idents(seurat.obj)
+
+# 13. Result visualization and validation
+# Annotation result visualization
+p1 <- DimPlot(seurat.obj, reduction = "umap", group.by = "cell.type", label = TRUE)
+p2 <- DimPlot(seurat.obj, reduction = "umap", group.by = "SingleR.labels", label = TRUE)
+
+# Marker gene heatmap
+top.markers <- cluster.markers %>% 
+  group_by(cluster) %>% 
+  top_n(n = 3, wt = avg_log2FC)
+
+DoHeatmap(seurat.obj, features = top.markers$gene, group.by = "cell.type")
+
+# 14. Advanced analysis: trajectory analysis preparation
+library(monocle3)
+library(SeuratWrappers)
+
+# Convert to CDS format for trajectory analysis
+cds <- as.cell_data_set(seurat.obj)
+cds <- cluster_cells(cds)
+cds <- learn_graph(cds)
+
+print("Complex single-cell RNA-seq annotation analysis complete!")
+print(paste("Final identified cell types:", length(unique(seurat.obj$cell.type))))
+
+# Save results
+saveRDS(seurat.obj, "complex_scRNA_annotated.rds")
+
+\bio

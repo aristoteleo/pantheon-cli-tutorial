@@ -1,0 +1,121 @@
+## 1. Build Default RAG Database
+$ python -m pantheon.toolsets.utils.rag build pantheon_cli/cli/rag_system_config.yaml tmp/pantheon_cli_tools_rag
+🔄 Starting RAG database construction...
+📥 Downloading document source: kallisto-bustools
+📥 Downloading document source: star  
+📥 Downloading document source: cellranger
+📥 Downloading document source: seurat
+📥 Downloading document source: scanpy
+📥 Downloading document source: bulk-rna-seq
+
+🧠 Using embedding model: text-embedding-3-large
+⚙️  Chunk size: 4000 characters, overlap: 200 characters
+
+┌─ RAG Construction Progress ──────────────────────┐
+│ [████████████████████████████████] 100%        │
+│                                                 │
+│ Documents processed: 1,247                      │
+│ Vectors generated: 8,934                        │
+│ Database size: 156.7 MB                         │
+│ Time elapsed: 8m12s                             │
+└─────────────────────────────────────────────────┘
+✅ RAG database construction complete: tmp/pantheon_cli_tools_rag/pantheon-cli-tools
+
+## 2. Start Pantheon-CLI with RAG Functionality
+$ pantheon-cli
+🚀 Starting Pantheon-CLI...
+🔍 RAG database detected: tmp/pantheon_cli_tools_rag/pantheon-cli-tools
+✅ RAG functionality enabled - supports bioinformatics tool queries
+
+Welcome to Pantheon-CLI! You can directly ask bioinformatics-related questions.
+
+## 3. Test RAG Functionality in CLI
+> How to use kallisto and bustools to process single-cell RNA-seq data?
+🔍 Searching relevant information in RAG database...
+
+📚 Found relevant documents: kallisto-bustools official documentation
+💡 kallisto | bustools is a workflow for single-cell RNA-seq data preprocessing, including:
+1. Associate reads with cells
+2. Merge reads based on UMI  
+3. Generate gene expression matrix
+
+Specific workflow:
+```bash
+# 1. Build index
+kallisto index -i index.idx transcriptome.fa
+
+# 2. Quantification analysis
+kallisto bus -i index.idx -o output/ reads_1.fastq reads_2.fastq
+
+# 3. Generate matrix
+bustools correct -w whitelist.txt output/output.bus | \
+bustools sort -o output/output.sort.bus
+```
+
+## 4. Check RAG Database Status
+$ ls -la tmp/pantheon_cli_tools_rag/pantheon-cli-tools
+total 320M
+drwxr-xr-x  5 user  staff   160B Mar 15 14:30 .
+drwxr-xr-x  3 user  staff    96B Mar 15 14:29 ..
+-rw-r--r--  1 user  staff   156M Mar 15 14:30 index.faiss
+-rw-r--r--  1 user  staff   2.3M Mar 15 14:30 metadata.json
+-rw-r--r--  1 user  staff   1.2K Mar 15 14:30 config.yaml
+
+## 5. Use Custom RAG Configuration
+$ cat > custom_rag.yaml << EOF
+my-lab-protocols:
+  description: Laboratory protocol document library
+  type: vector_db
+  parameters:
+    embedding_model: text-embedding-3-large
+    chunk_size: 4000
+    chunk_overlap: 200
+  items:
+    lab-protocols:
+      type: local_directory
+      path: ./lab_docs
+      description: "Laboratory standard operating procedures"
+EOF
+
+$ python -m pantheon.toolsets.utils.rag build custom_rag.yaml ./my_custom_rag
+🔄 Building custom RAG database...
+📁 Scanning local directory: ./lab_docs
+✅ Custom RAG database construction complete
+
+$ pantheon-cli --rag_db ./my_custom_rag/my-lab-protocols
+🚀 Starting Pantheon-CLI...
+✅ Using custom RAG database: ./my_custom_rag/my-lab-protocols
+
+## 6. Start with RAG Functionality Disabled
+$ pantheon-cli --disable_rag
+🚀 Starting Pantheon-CLI...
+⚠️  RAG functionality disabled - will not use knowledge base retrieval
+
+## 7. Python API Test RAG Query
+$ python -c "
+from pantheon.toolsets.utils.rag.vectordb import VectorDB
+import asyncio
+
+async def test_rag():
+    db = VectorDB('tmp/pantheon_cli_tools_rag/pantheon-cli-tools')
+    results = await db.query('single-cell RNA-seq quality control', top_k=3)
+    for r in results:
+        print(f'Relevance: {r.score:.3f}')
+        print(f'Source: {r.metadata[\"source\"]}')
+        print(f'Content: {r.content[:100]}...')
+        print('---')
+
+asyncio.run(test_rag())
+"
+Relevance: 0.876
+Source: scanpy
+Content: Quality control metrics are essential for single-cell RNA-seq analysis...
+---
+Relevance: 0.823
+Source: seurat  
+Content: We start by reading in the data and creating a Seurat object with QC metrics...
+---
+Relevance: 0.791
+Source: cellranger
+Content: Cell Ranger provides automated quality control filtering...
+---

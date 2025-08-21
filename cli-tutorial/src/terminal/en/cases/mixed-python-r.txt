@@ -1,0 +1,57 @@
+# Python Mixed Programming Terminal Demonstration
+
+# First Round: Random Number Generation
+Generate 10 random numbers
+
+# System auto-execution:
+# Generate 10 random numbers in [0,1)
+try:
+    import numpy as np
+except Exception:
+    pass
+
+rand_nums = np.random.rand(10).tolist()
+print(rand_nums)
+rand_nums
+
+# Output result:
+[0.12503025968481385, 0.6831302549495222, 0.4784760603762457, 0.033863135917047926, 0.9343923994669411, 0.12618417110531088, 0.1660418598631337, 0.3929838589644551, 0.5248320170746258, 0.6894876053780613]
+
+# Second Round: Regeneration (demonstrating consistency)
+Generate 10 random numbers
+
+# System execution:
+import numpy as np
+nums = np.random.rand(10).tolist()
+print(nums)
+nums
+
+# Output result:
+[0.41038397186446574, 0.7268925459803518, 0.1776869757668036, 0.8344962113029184, 0.8747606213084439, 0.5701383903257705, 0.30209926423528977, 0.5915732090235458, 0.4728018329803404, 0.5613809946871403]
+
+# Third Round: Statistical Analysis (demonstrating contextual understanding)
+Show mean and standard deviation
+
+# System intelligent execution:
+import numpy as np
+# Use existing 'nums' if available, otherwise generate new
+try:
+    nums
+except NameError:
+    nums = np.random.rand(10).tolist()
+
+mean_val = float(np.mean(nums))
+std_val = float(np.std(nums, ddof=0))
+mean_val, std_val
+
+# Output result:
+(0.552221401747507, 0.2110536781456135)
+
+# Technical Feature Showcase:
+# ✅ Natural language understanding
+# ✅ Variable state persistence  
+# ✅ Intelligent exception handling
+# ✅ Context-aware computation
+# ✅ Professional statistical terminology interpretation
+
+\bio

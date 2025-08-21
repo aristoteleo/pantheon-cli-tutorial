@@ -1,4 +1,4 @@
-# 界面介绍
+# Interface Introduction
 
 $ pantheon-cli
 Aristotle © 2025
@@ -25,15 +25,15 @@ Enter your message (press Enter twice to finish)
 
 ---
 
-# 快速体验
-$ 生成10个随机数并计算平均值
+# Quick Experience
+$ Generate 10 random numbers and calculate the average
 
 ⏺ Python
 ╭─────────────────────────────────────────────────────────────────────────────╮
 │ Run Python code                                                             │
 │ ╭─────────────────────────────────────────────────────────────────────────╮ │
 │ │ import random                                                           │ │
-│ │ nums =                              │ │
+│ │ nums = [random.random() for _ in range(10)]                             │ │
 │ │ mean = sum(nums)/len(nums)                                              │ │
 │ │ result = {'numbers': nums, 'mean': mean}                                │ │
 │ │ print('Numbers:', nums)                                                 │ │
@@ -50,13 +50,13 @@ $ 生成10个随机数并计算平均值
 
 ▩ Processing... • 3 in, 335 out • 15.4s
 
-我已生成10个随机数并计算了平均值。                                                                  
+I have generated 10 random numbers and calculated the average.                                                                  
 
-随机数： [0.7058720095986091, 0.5696232168234353, 0.4491301920592734, 0.4730434745822676,           
+Random numbers: [0.7058720095986091, 0.5696232168234353, 0.4491301920592734, 0.4730434745822676,           
 0.4866025115035906, 0.49513128347713753, 0.2061331076010684, 0.7410079369637138,                    
 0.27331610389859406, 0.4166894572970383]                                                            
 
-平均值：0.48165492938047283                                                                         
+Average: 0.48165492938047283                                                                         
 
 The user asked in Chinese: generate 10 random numbers and compute average. Already did. Need to     
 ensure no extra actions like mark_task_done required—developer required to call mark_task_done after
@@ -72,13 +72,13 @@ supply code snippet? Not necessary.
 
 Okay final message should perhaps include how to regenerate or to set seed. But keep concise.       
 
-Return final in Chinese. 已为你生成 10 个随机数并计算平均值。                                       
+Return final in Chinese. I have generated 10 random numbers and calculated the average.                                       
 
-随机数： [0.7058720095986091, 0.5696232168234353, 0.4491301920592734, 0.4730434745822676,           
+Random numbers: [0.7058720095986091, 0.5696232168234353, 0.4491301920592734, 0.4730434745822676,           
 0.4866025115035906, 0.49513128347713753, 0.2061331076010684, 0.7410079369637138,                    
 0.27331610389859406, 0.4166894572970383]                                                            
 
-平均值：0.48165492938047283                                                                         
+Average: 0.48165492938047283                                                                         
 
-如果你想要可复现的结果，我可以用指定随机种子重新生成；或者你需要整数范围、正态分布等其它类型的随机数
-也可以告诉我。   
+If you want reproducible results, I can regenerate with a specified random seed; or if you need integer ranges, normal distribution, or other types of random numbers,
+please let me know.

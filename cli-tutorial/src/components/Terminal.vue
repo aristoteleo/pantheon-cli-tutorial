@@ -242,14 +242,14 @@ const loadTerminalContent = async () => {
       // 如果文件不存在，显示默认内容
       parsedContent.value = [{
         type: 'comment',
-        content: '该页面的终端演示内容正在准备中...'
+        content: 'The terminal content for this page is currently being prepared...'
       }]
     }
   } catch (error) {
     console.error('Failed to load terminal content:', error)
     parsedContent.value = [{
       type: 'comment',
-      content: '加载终端内容失败'
+      content: 'Failed to load terminal content'
     }]
   } finally {
     loading.value = false

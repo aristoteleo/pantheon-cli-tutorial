@@ -1,0 +1,155 @@
+# Financial Target Customer Analysis Terminal Demonstration
+
+# Start Python environment for financial data analysis
+python
+
+# 1. Import necessary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+
+# 2. Load customer data
+customer_data = pd.read_csv('customer_financial_data.csv')
+print(f"Data shape: {customer_data.shape}")
+print(f"Column list: {list(customer_data.columns)}")
+
+# Data overview
+customer_data.head()
+customer_data.describe()
+
+# 3. Data preprocessing and feature engineering
+# Handle missing values
+customer_data.fillna(customer_data.median(), inplace=True)
+
+# Create key features
+customer_data['income_to_debt_ratio'] = customer_data['annual_income'] / (customer_data['total_debt'] + 1)
+customer_data['credit_utilization'] = customer_data['credit_used'] / customer_data['credit_limit']
+customer_data['age_group'] = pd.cut(customer_data['age'], bins=[0, 30, 45, 60, 100], labels=['Young', 'Middle', 'Senior', 'Elder'])
+
+# 4. Customer segmentation analysis
+# Select clustering features
+cluster_features = ['annual_income', 'credit_score', 'total_debt', 'account_balance', 
+                   'income_to_debt_ratio', 'credit_utilization']
+
+# Standardize data
+scaler = StandardScaler()
+scaled_features = scaler.fit_transform(customer_data[cluster_features])
+
+# K-means clustering
+kmeans = KMeans(n_clusters=4, random_state=42)
+customer_data['cluster'] = kmeans.fit_predict(scaled_features)
+
+# Visualize clustering results
+plt.figure(figsize=(12, 8))
+scatter = plt.scatter(customer_data['annual_income'], customer_data['credit_score'], 
+                     c=customer_data['cluster'], cmap='viridis', alpha=0.6)
+plt.xlabel('Annual Income')
+plt.ylabel('Credit Score')
+plt.title('Customer Segmentation Clustering Analysis')
+plt.colorbar(scatter)
+plt.show()
+
+# 5. Clustering feature analysis
+cluster_summary = customer_data.groupby('cluster')[cluster_features].mean()
+print("Characteristics of each cluster group:")
+print(cluster_summary)
+
+# 6. Customer value assessment
+# Define high-value customer criteria
+customer_data['high_value'] = (
+    (customer_data['annual_income'] > customer_data['annual_income'].quantile(0.7)) &
+    (customer_data['credit_score'] > 650) &
+    (customer_data['account_balance'] > customer_data['account_balance'].quantile(0.6))
+).astype(int)
+
+# 7. Predictive model building
+# Prepare features and target variables
+feature_cols = ['age', 'annual_income', 'credit_score', 'total_debt', 
+               'account_balance', 'income_to_debt_ratio', 'credit_utilization']
+
+X = customer_data[feature_cols]
+y = customer_data['high_value']
+
+# Split train-test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train random forest model
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)
+
+# Model evaluation
+train_score = rf_model.score(X_train, y_train)
+test_score = rf_model.score(X_test, y_test)
+
+print(f"Training accuracy: {train_score:.3f}")
+print(f"Testing accuracy: {test_score:.3f}")
+
+# Feature importance analysis
+feature_importance = pd.DataFrame({
+    'feature': feature_cols,
+    'importance': rf_model.feature_importances_
+}).sort_values('importance', ascending=False)
+
+print("Feature importance ranking:")
+print(feature_importance)
+
+# 8. Target customer identification
+# Predict value probability for all customers
+customer_data['value_probability'] = rf_model.predict_proba(X)[:, 1]
+
+# Identify top 10% high-potential customers
+top_prospects = customer_data.nlargest(int(len(customer_data) * 0.1), 'value_probability')
+
+print(f"Identified {len(top_prospects)} high-potential target customers")
+print("Target customer characteristics:")
+print(top_prospects[['annual_income', 'credit_score', 'account_balance', 'value_probability']].describe())
+
+# 9. Marketing recommendation generation
+def generate_marketing_strategy(cluster_id, cluster_data):
+    """Generate marketing strategy for different clusters"""
+    
+    avg_income = cluster_data['annual_income'].mean()
+    avg_credit = cluster_data['credit_score'].mean()
+    avg_balance = cluster_data['account_balance'].mean()
+    
+    if avg_income > 80000 and avg_credit > 700:
+        return "High-end customer segment - Recommend high-value investment products and private banking services"
+    elif avg_income > 50000 and avg_credit > 650:
+        return "Mid-high-end customers - Recommend wealth management products and credit card upgrade services"
+    elif avg_credit < 600:
+        return "Credit repair customers - Recommend credit repair services and small loan products"
+    else:
+        return "Regular customers - Recommend basic savings products and standard credit cards"
+
+# Generate strategy for each cluster
+for cluster_id in customer_data['cluster'].unique():
+    cluster_data = customer_data[customer_data['cluster'] == cluster_id]
+    strategy = generate_marketing_strategy(cluster_id, cluster_data)
+    print(f"Cluster {cluster_id}: {strategy}")
+
+# 10. Results export
+# Save target customer list
+top_prospects[['customer_id', 'annual_income', 'credit_score', 'value_probability', 'cluster']].to_csv('target_customers.csv', index=False)
+
+# Save marketing strategy report
+marketing_report = customer_data.groupby('cluster').agg({
+    'customer_id': 'count',
+    'annual_income': 'mean',
+    'credit_score': 'mean',
+    'account_balance': 'mean',
+    'value_probability': 'mean'
+}).round(2)
+
+marketing_report.to_csv('cluster_marketing_strategy.csv')
+
+print("Analysis complete!")
+print("Generated files:")
+print("- target_customers.csv: High-potential target customer list")
+print("- cluster_marketing_strategy.csv: Cluster marketing strategy report")
+
+\bio

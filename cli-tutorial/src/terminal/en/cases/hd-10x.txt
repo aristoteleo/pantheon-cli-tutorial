@@ -1,0 +1,140 @@
+# 10x HD Visium Cell Segmentation Real Case
+
+# Spatial transcriptomics data initialization
+clear_all_todos({})
+show_todos({'show_completed': True})
+
+# Provide spatial data path and image information
+data: data_HD_sp/binned_outputs/square_002um, image: Visium_HD_Human_Colon_Cancer_tissue_image.btf
+
+# View data directory structure
+ls({'path': 'data_HD_sp/binned_outputs/square_002um', 'show_hidden': False, 'show_details': True, 'recursive': False})
+
+# Discovered file structure:
+# filtered_feature_bc_matrix/ (directory)
+# raw_feature_bc_matrix/ (directory) 
+# spatial/ (directory)
+# filtered_feature_bc_matrix.h5 (460412254 bytes)
+# raw_feature_bc_matrix.h5 (506917643 bytes)
+# raw_probe_bc_matrix.h5 (532808403 bytes)
+
+# View spatial directory contents
+ls({'path': 'data_HD_sp/binned_outputs/square_002um/spatial', 'show_hidden': False, 'show_details': True, 'recursive': False})
+
+# spatial directory contains:
+# aligned_fiducials.jpg (3090458 bytes)
+# aligned_tissue_image.jpg (1556093 bytes)
+# cytassist_image.tiff (26635869 bytes)
+# detected_tissue_image.jpg (913309 bytes)
+# scalefactors_json.json (296 bytes)
+# tissue_hires_image.png (30476167 bytes)
+# tissue_lowres_image.png (290777 bytes)
+# tissue_positions.parquet (169709102 bytes)
+
+# View image file information
+ls({'path': '.', 'show_hidden': False, 'show_details': True, 'recursive': False})
+
+# Check BTF image file
+check if Visium_HD_Human_Colon_Cancer_tissue_image.btf exists
+
+# Set spatial analysis parameters
+set image_path to Visium_HD_Human_Colon_Cancer_tissue_image.btf and data_path to data_HD_sp/binned_outputs/square_002um
+
+# Create spatial task
+add_task({'task_description': 'Load Visium HD data and segment cells'})
+
+# Start loading spatial transcriptomics data
+run_r_code loading spatial data from data_HD_sp/binned_outputs/square_002um
+
+# Launch R environment for HD analysis
+R
+
+library(Seurat)
+library(SeuratData)
+library(ggplot2)
+library(patchwork)
+
+# Load 10x Visium HD data
+spatial_data <- Load10X_Spatial(
+  data.dir = "data_HD_sp/binned_outputs/square_002um/",
+  filename = "filtered_feature_bc_matrix.h5",
+  assay = "Spatial",
+  slice = "slice1",
+  filter.matrix = TRUE,
+  to.upper = FALSE,
+  image = Seurat::Read10X_Image(
+    image.dir = "data_HD_sp/binned_outputs/square_002um/spatial/",
+    image.name = "tissue_hires_image.png"
+  )
+)
+
+# View data overview
+print(spatial_data)
+print(paste("Number of spots:", ncol(spatial_data)))
+print(paste("Number of genes:", nrow(spatial_data)))
+
+# Calculate QC metrics
+spatial_data[["percent.mt"]] <- PercentageFeatureSet(spatial_data, pattern = "^MT-")
+
+# Spatial QC visualization
+SpatialFeaturePlot(spatial_data, features = "nCount_Spatial") + 
+  theme(legend.position = "right")
+
+# Visualize mitochondrial gene expression
+SpatialFeaturePlot(spatial_data, features = "percent.mt") + 
+  theme(legend.position = "right")
+
+# HD cell segmentation preprocessing
+spatial_data <- subset(spatial_data, 
+                      subset = nFeature_Spatial > 200 & 
+                              nFeature_Spatial < 8000 & 
+                              percent.mt < 30)
+
+# SCTransform normalization (suitable for HD data)
+spatial_data <- SCTransform(spatial_data, assay = "Spatial", verbose = FALSE)
+
+# PCA analysis
+spatial_data <- RunPCA(spatial_data, assay = "SCT", verbose = FALSE)
+
+# High-resolution clustering (HD-specific)
+spatial_data <- FindNeighbors(spatial_data, reduction = "pca", dims = 1:30)
+spatial_data <- FindClusters(spatial_data, verbose = FALSE, resolution = 1.2)
+
+# UMAP dimensionality reduction
+spatial_data <- RunUMAP(spatial_data, reduction = "pca", dims = 1:30)
+
+# HD spatial clustering visualization
+SpatialDimPlot(spatial_data, 
+               group.by = "seurat_clusters", 
+               label = TRUE, 
+               label.size = 3,
+               pt.size.factor = 0.8)
+
+# High-resolution marker gene identification
+cluster_markers <- FindAllMarkers(spatial_data, 
+                                 only.pos = TRUE, 
+                                 min.pct = 0.1, 
+                                 logfc.threshold = 0.25)
+
+# Visualize spatial expression of top marker genes
+top_markers <- cluster_markers %>% 
+  group_by(cluster) %>% 
+  top_n(n = 1, wt = avg_log2FC)
+
+SpatialFeaturePlot(spatial_data, 
+                   features = head(top_markers$gene, 6), 
+                   ncol = 3, 
+                   alpha = c(0.1, 1))
+
+# Save HD cell segmentation results
+saveRDS(spatial_data, file = "visium_hd_segmented.rds")
+
+# Generate segmentation report
+cat("10x HD Visium cell segmentation analysis complete\n")
+cat("Identified", length(unique(spatial_data$seurat_clusters)), "spatial cell populations\n")
+cat("Processed", ncol(spatial_data), "high-resolution spatial spots\n")
+
+# Mark task complete
+mark_task_done({'task_description': 'Load Visium HD data and segment cells'})
+
+\bio

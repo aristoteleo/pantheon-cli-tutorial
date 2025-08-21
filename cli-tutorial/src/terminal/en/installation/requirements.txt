@@ -1,0 +1,24 @@
+# Check Python version
+$ python --version
+> Python 3.11.5
+
+---
+
+# Check pip version
+$ pip --version
+> pip 23.3.1 from /usr/local/lib/python3.11/site-packages/pip (python 3.11)
+
+---
+
+# Check system information
+$ uname -a
+> Darwin MacBook-Pro.local 23.0.0 Darwin Kernel Version 23.0.0: Fri Sep 15 14:41:43 PDT 2023; root:xnu-10002.1.13~1/RELEASE_ARM64_T6020 arm64
+
+---
+
+
+# Check required Python packages
+$ pip list | grep -E "pandas|numpy|matplotlib"
+> numpy         1.25.2
+> pandas        2.1.0
+> matplotlib    3.7.2

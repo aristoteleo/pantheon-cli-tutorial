@@ -1,0 +1,30 @@
+# Model Configuration Command Demonstration
+
+## 1. Configure OpenAI API Key
+$ /api-key openai sk-xxxxxxxxxxxxxxxxxxxx
+✓ OpenAI API key successfully configured
+
+## 2. Configure Claude API Key  
+$ /api-key anthropic sk-ant-xxxxxxxxxxxxxxxxxxxx
+✓ Claude API key successfully configured
+
+## 3. Set Default Model
+$ /model gpt-5
+✓ Default model set to: gpt-5
+
+## 4. View Current Configuration
+$ /api-key
+🔑 API Key Management:
+
+✅ OpenAI: openai (saved + environment)
+❌ Anthropic: anthropic
+❌ Google: google
+❌ DeepSeek: deepseek
+❌ Qwen (Alibaba): qwen
+❌ Kimi (Moonshot): moonshot
+❌ Grok (xAI): grok
+
+
+## 5. Environment Variable Configuration Example
+$ export OPENAI_API_KEY="your_api_key_here"
+$ export CLAUDE_API_KEY="your_claude_key_here" 

@@ -1,0 +1,231 @@
+# Single-cell LLM Automated Learning Terminal Demonstration
+
+# Start Python environment for online tutorial learning
+python
+
+# 1. Environment setup and dependency import
+import requests
+import pandas as pd
+import numpy as np
+import scanpy as sc
+from transformers import AutoTokenizer, AutoModel
+import openai
+from bs4 import BeautifulSoup
+import json
+
+# Set scanpy environment
+sc.settings.verbosity = 3
+sc.settings.set_figure_params(dpi=80, facecolor='white')
+
+# 2. Online tutorial content scraping
+def fetch_tutorial_content(url):
+    """Scrape single-cell analysis content from online tutorials"""
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    # Extract code blocks and text content
+    code_blocks = [code.get_text() for code in soup.find_all('code')]
+    text_content = soup.get_text()
+    
+    return {'code': code_blocks, 'text': text_content}
+
+# Scrape Scanpy official tutorial
+tutorial_url = "https://scanpy.readthedocs.io/en/stable/tutorials.html"
+tutorial_content = fetch_tutorial_content(tutorial_url)
+
+print(f"Successfully scraped {len(tutorial_content['code'])} code blocks")
+
+# 3. LLM-assisted code generation
+def query_scLLM(prompt, context=None):
+    """Query single-cell domain-specific LLM"""
+    system_prompt = """You are a single-cell RNA sequencing data analysis expert.
+    Provide executable code and detailed explanations based on scanpy and best practices."""
+    
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": f"Context: {context}\nQuestion: {prompt}" if context else prompt}
+    ]
+    
+    # Call GPT-4 or specialized bioinformatics model
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=messages,
+        temperature=0.1,
+        max_tokens=1500
+    )
+    
+    return response.choices[0].message.content
+
+# 4. Intelligent single-cell analysis workflow
+# Ask LLM for best data loading practices
+loading_advice = query_scLLM(
+    "How to load and preprocess 10X Genomics data using scanpy?",
+    context=tutorial_content['text'][:500]
+)
+
+print("LLM recommended data loading method:")
+print(loading_advice)
+
+# 5. Execute analysis based on LLM recommendations
+# Load example data
+adata = sc.datasets.pbmc3k_processed()
+print(f"Data dimensions: {adata.shape}")
+
+# Ask for QC recommendations
+qc_advice = query_scLLM(
+    "What metrics should single-cell RNA-seq data QC include? How to set filtering thresholds?"
+)
+
+print("QC recommendations:")
+print(qc_advice)
+
+# 6. Intelligent QC execution
+# Execute QC based on LLM recommendations
+adata.var['mt'] = adata.var_names.str.startswith('MT-')
+sc.pp.calculate_qc_metrics(adata, percent_top=None, log1p=False, inplace=True)
+
+# Ask about normalization methods
+norm_advice = query_scLLM(
+    "What are the normalization methods for single-cell data? When to use log normalization vs advanced methods?"
+)
+
+print("Normalization recommendations:")
+print(norm_advice)
+
+# Execute normalization
+sc.pp.normalize_total(adata, target_sum=1e4)
+sc.pp.log1p(adata)
+
+# 7. Intelligent feature selection
+feature_advice = query_scLLM(
+    "How to select highly variable genes? How to avoid cell cycle gene influence?"
+)
+
+print("Feature selection recommendations:")
+print(feature_advice)
+
+# Select features based on recommendations
+sc.pp.highly_variable_genes(adata, min_mean=0.0125, max_mean=3, min_disp=0.5)
+sc.pl.highly_variable_genes(adata)
+
+# 8. Clustering parameter optimization
+clustering_advice = query_scLLM(
+    "How to select optimal clustering resolution? How to assess clustering quality?"
+)
+
+print("Clustering recommendations:")
+print(clustering_advice)
+
+# Execute dimensionality reduction and clustering
+sc.pp.scale(adata, max_value=10)
+sc.tl.pca(adata, svd_solver='arpack')
+sc.pp.neighbors(adata, n_neighbors=10, n_pcs=40)
+
+# Test multiple resolutions
+for res in [0.1, 0.3, 0.5, 0.7]:
+    sc.tl.leiden(adata, resolution=res, key_added=f'leiden_res{res}')
+
+# 9. Cell type annotation guidance
+annotation_advice = query_scLLM(
+    "What are the main cell types and marker genes for PBMC data? How to perform automatic annotation?"
+)
+
+print("Annotation recommendations:")
+print(annotation_advice)
+
+# Annotate based on recommendations
+sc.tl.leiden(adata, resolution=0.5)
+sc.tl.rank_genes_groups(adata, 'leiden', method='wilcoxon')
+
+# Visualize results
+sc.pl.umap(adata, color=['leiden', 'CST3', 'NKG7', 'PPBP'])
+
+# 10. Advanced analysis recommendations
+advanced_advice = query_scLLM(
+    "After basic clustering, what advanced analyses can be performed? Trajectory analysis, cell communication, etc.?"
+)
+
+print("Advanced analysis recommendations:")
+print(advanced_advice)
+
+# 11. Automated code execution (safety check)
+def execute_llm_code(code_string):
+    """Safely execute LLM-generated code"""
+    # Simple safety check
+    dangerous_patterns = ['import os', 'subprocess', 'eval', 'exec']
+    
+    if any(pattern in code_string for pattern in dangerous_patterns):
+        print("Potentially risky code detected, skipping execution")
+        return
+    
+    try:
+        exec(code_string, globals())
+        print("Code execution successful")
+    except Exception as e:
+        print(f"Code execution failed: {e}")
+
+# 12. Trajectory analysis code generation
+trajectory_code = query_scLLM(
+    "Generate code for trajectory analysis using scanpy, including PAGA and diffusion map."
+)
+
+print("LLM-generated trajectory analysis code:")
+print(trajectory_code)
+
+# 13. Intelligent result interpretation
+current_analysis = f"""
+Analysis results overview:
+- Number of cells: {adata.n_obs}
+- Number of genes: {adata.n_vars}
+- Number of clusters identified: {len(adata.obs['leiden'].unique())}
+- Number of highly variable genes: {sum(adata.var['highly_variable'])}
+"""
+
+interpretation = query_scLLM(
+    f"Please explain the biological significance of the following analysis results: {current_analysis}"
+)
+
+print("Results interpretation:")
+print(interpretation)
+
+# 14. Learning record and parameter optimization
+def adaptive_tuning():
+    """Provide optimization recommendations based on current results"""
+    n_clusters = len(adata.obs['leiden'].unique())
+    
+    if n_clusters < 5:
+        return query_scLLM(f"Only {n_clusters} clusters, how to increase resolution?")
+    elif n_clusters > 15:
+        return query_scLLM(f"{n_clusters} clusters too many, how to optimize parameters?")
+    else:
+        return query_scLLM(f"{n_clusters} clusters reasonable, how to validate quality?")
+
+tuning_advice = adaptive_tuning()
+print("Parameter tuning recommendations:")
+print(tuning_advice)
+
+# 15. Save learning results
+learning_log = {
+    'tutorial_sources': [tutorial_url],
+    'llm_interactions': [
+        loading_advice, qc_advice, norm_advice, 
+        feature_advice, clustering_advice, annotation_advice
+    ],
+    'analysis_summary': {
+        'n_cells': adata.n_obs,
+        'n_genes': adata.n_vars,
+        'n_clusters': len(adata.obs['leiden'].unique())
+    }
+}
+
+# Save results
+adata.write('scllm_result.h5ad')
+with open('learning_log.json', 'w') as f:
+    json.dump(learning_log, f, indent=2)
+
+print("Single-cell LLM-assisted analysis complete!")
+print("Output files:")
+print("- scllm_result.h5ad: Analysis results")
+print("- learning_log.json: Learning record")
+
+\bio

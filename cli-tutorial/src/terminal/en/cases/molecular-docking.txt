@@ -1,0 +1,152 @@
+# Molecular Docking and Structural Analysis Terminal Demonstration
+
+# Start Python environment for molecular docking analysis
+python
+
+# 1. Protein structure preparation
+from Bio.PDB import PDBParser, PDBIO
+import requests
+import os
+
+def download_pdb_structure(pdb_id, output_dir="structures"):
+    """Download protein structure from PDB database"""
+    os.makedirs(output_dir, exist_ok=True)
+    
+    url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        pdb_file = f"{output_dir}/{pdb_id}.pdb" 
+        with open(pdb_file, 'w') as f:
+            f.write(response.text)
+        return pdb_file
+
+# Download target protein structure (e.g., COVID-19 main protease)
+protein_file = download_pdb_structure("6LU7")
+print(f"Protein structure downloaded: {protein_file}")
+
+# 2. Ligand library preparation
+from rdkit import Chem
+from rdkit.Chem import Descriptors
+
+def prepare_ligand_library(sdf_file):
+    """Prepare ligand molecule library"""
+    supplier = Chem.SDMolSupplier(sdf_file)
+    ligands = []
+    
+    for mol in supplier:
+        if mol is not None:
+            # Calculate molecular descriptors
+            mw = Descriptors.MolWt(mol)
+            logp = Descriptors.MolLogP(mol) 
+            if 150 < mw < 500 and logp < 5:  # Lipinski's rule filtering
+                ligands.append(mol)
+    
+    return ligands
+
+# 3. Molecular docking simulation
+from vina import Vina
+
+def run_molecular_docking(protein_pdb, ligand_sdf, center, size):
+    """Execute molecular docking"""
+    
+    # Initialize Vina object
+    v = Vina(sf_name='vina')
+    
+    # Set receptor
+    v.set_receptor(protein_pdb)
+    
+    # Set ligand
+    v.set_ligand_from_file(ligand_sdf)
+    
+    # Define search space
+    v.compute_vina_maps(center=center, box_size=size)
+    
+    # Execute docking
+    v.dock(exhaustiveness=8, n_poses=10)
+    
+    # Get docking results
+    return v.poses(n_poses=10)
+
+# Set docking parameters (active site coordinates)
+center = [-26.3, 13.8, 58.6]  # 6LU7 active site center
+box_size = [15, 15, 15]       # Search box size
+
+# 4. Results analysis and visualization
+import matplotlib.pyplot as plt
+import numpy as np
+
+def analyze_docking_results(poses):
+    """Analyze docking results"""
+    scores = []
+    energies = []
+    
+    for i, pose in enumerate(poses):
+        scores.append(pose['affinity'])
+        energies.append(pose['intramolecular_energy'])
+    
+    # Plot score distribution
+    plt.figure(figsize=(10, 6))
+    plt.subplot(1, 2, 1)
+    plt.hist(scores, bins=20, alpha=0.7)
+    plt.xlabel('Binding Affinity (kcal/mol)')
+    plt.ylabel('Frequency')
+    plt.title('Docking Score Distribution')
+    
+    plt.subplot(1, 2, 2)
+    plt.scatter(scores, energies, alpha=0.7)
+    plt.xlabel('Binding Affinity')
+    plt.ylabel('Intramolecular Energy')
+    plt.title('Energy Correlation Analysis')
+    
+    plt.tight_layout()
+    plt.show()
+    
+    return scores, energies
+
+# 5. Interaction analysis
+from pymol import cmd
+
+def visualize_binding_pose(protein_pdb, ligand_pose):
+    """Visualize binding pose using PyMOL"""
+    
+    # Load protein structure
+    cmd.load(protein_pdb, "protein")
+    
+    # Load best docking pose
+    cmd.load(ligand_pose, "ligand")
+    
+    # Set display styles
+    cmd.show("cartoon", "protein")
+    cmd.show("sticks", "ligand")
+    cmd.color("cyan", "protein")
+    cmd.color("yellow", "ligand")
+    
+    # Display hydrogen bonds
+    cmd.distance("hbonds", "protein", "ligand", cutoff=3.2, mode=2)
+    
+    # Save image
+    cmd.png("binding_pose.png", dpi=300)
+
+# Execute complete analysis workflow
+print("Starting molecular docking analysis...")
+
+# Run docking
+docking_poses = run_molecular_docking(
+    protein_pdb="6LU7_prepared.pdb",
+    ligand_sdf="compounds.sdf", 
+    center=center,
+    size=box_size
+)
+
+# Analyze results
+scores, energies = analyze_docking_results(docking_poses)
+
+# Output best compound
+best_score = min(scores)
+print(f"Best docking score: {best_score:.2f} kcal/mol")
+
+# Visualize best binding pose
+visualize_binding_pose("6LU7.pdb", "best_pose.sdf")
+
+\bio

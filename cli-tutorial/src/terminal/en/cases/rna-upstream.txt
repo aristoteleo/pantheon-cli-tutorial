@@ -1,0 +1,146 @@
+# RNA-seq Upstream Processing Terminal Demonstration
+
+# Start terminal for RNA-seq data processing
+bash
+
+# 1. Data quality check
+# Use FastQC to check raw data quality
+fastqc raw_data/*.fastq.gz -o qc_raw/ -t 8
+
+# Generate comprehensive quality report
+multiqc qc_raw/ -o multiqc_raw/
+
+# 2. Sequence quality control and preprocessing
+# Use fastp for quality control and filtering
+fastp -i sample_R1.fastq.gz -I sample_R2.fastq.gz \
+  -o sample_clean_R1.fastq.gz -O sample_clean_R2.fastq.gz \
+  --thread=8 --html=sample_fastp.html --json=sample_fastp.json \
+  --detect_adapter_for_pe \
+  --cut_front --cut_tail --cut_window_size 4 --cut_mean_quality 20 \
+  --length_required 36
+
+# Check processed data quality
+fastqc sample_clean_*.fastq.gz -o qc_clean/ -t 8
+multiqc qc_clean/ -o multiqc_clean/
+
+# 3. Reference genome indexing (if not already done)
+# Build HISAT2 index
+hisat2-build -p 8 hg38.fa hg38_hisat2_index
+
+# Download splice sites and exon information
+hisat2_extract_splice_sites.py gencode.v38.annotation.gtf > splice_sites.txt
+hisat2_extract_exons.py gencode.v38.annotation.gtf > exons.txt
+
+# Rebuild index with splice site information
+hisat2-build -p 8 --ss splice_sites.txt --exon exons.txt hg38.fa hg38_hisat2_index
+
+# 4. Sequence alignment
+# Use HISAT2 for alignment
+hisat2 -x hg38_hisat2_index \
+  -1 sample_clean_R1.fastq.gz \
+  -2 sample_clean_R2.fastq.gz \
+  -S sample.sam \
+  -p 8 --rna-strandness RF
+
+# Convert to BAM format and sort
+samtools view -bS sample.sam | samtools sort -@ 8 -o sample_sorted.bam
+samtools index sample_sorted.bam
+
+# Clean up temporary SAM file
+rm sample.sam
+
+# 5. Alignment quality assessment
+# Generate alignment statistics
+samtools flagstat sample_sorted.bam > sample_alignment_stats.txt
+
+# Use RSeQC for RNA-seq specific quality control
+# Gene coverage analysis
+geneBody_coverage.py -r hg38_RefSeq.bed -i sample_sorted.bam -o sample
+
+# Intron-exon ratio
+split_bam.py -i sample_sorted.bam -r hg38_RefSeq.bed -o sample
+
+# Strand specificity check
+infer_experiment.py -r hg38_RefSeq.bed -i sample_sorted.bam
+
+# 6. Transcript quantification
+# Use StringTie for transcript assembly and quantification
+stringtie sample_sorted.bam \
+  -G gencode.v38.annotation.gtf \
+  -o sample_assembled.gtf \
+  -A sample_gene_abundances.tab \
+  -e -B \
+  -p 8
+
+# 7. Generate expression matrix (multi-sample case)
+# Create sample list file
+echo "sample sample_assembled.gtf" > sample_list.txt
+
+# Merge transcripts
+stringtie --merge -G gencode.v38.annotation.gtf -o merged.gtf sample_list.txt
+
+# Re-quantify all samples
+stringtie -e -B -p 8 -G merged.gtf -o sample_final.gtf sample_sorted.bam
+
+# 8. Use featureCounts for gene counting
+featureCounts -a gencode.v38.annotation.gtf \
+  -o sample_gene_counts.txt \
+  -p -B -C -t exon -g gene_id \
+  -T 8 \
+  sample_sorted.bam
+
+# 9. Generate coverage files for visualization
+# Generate normalized bigwig files
+bamCoverage -b sample_sorted.bam \
+  -o sample_coverage.bw \
+  --binSize 10 \
+  --normalizeUsing RPKM \
+  --numberOfProcessors 8
+
+# Generate strand-specific bigwig files
+bamCoverage -b sample_sorted.bam \
+  -o sample_forward.bw \
+  --binSize 10 \
+  --normalizeUsing RPKM \
+  --filterRNAstrand forward \
+  --numberOfProcessors 8
+
+bamCoverage -b sample_sorted.bam \
+  -o sample_reverse.bw \
+  --binSize 10 \
+  --normalizeUsing RPKM \
+  --filterRNAstrand reverse \
+  --numberOfProcessors 8
+
+# 10. Integrate quality control reports
+# Generate final MultiQC report
+multiqc . -o final_qc_report/ --title "RNA-seq Processing Report"
+
+# 11. Organize result files
+mkdir -p results/{bam,counts,coverage,qc}
+
+# Move result files to corresponding directories
+mv sample_sorted.bam* results/bam/
+mv *counts.txt results/counts/
+mv *.bw results/coverage/
+mv *qc* results/qc/
+mv final_qc_report/ results/qc/
+
+# 12. Generate processing summary
+echo "RNA-seq upstream processing complete"
+echo ""
+echo "Processing statistics:"
+grep "overall alignment rate" sample_alignment_stats.txt
+echo ""
+echo "Output files:"
+echo "- results/bam/: Alignment result files"
+echo "- results/counts/: Gene expression count files"
+echo "- results/coverage/: Coverage track files"
+echo "- results/qc/: Quality control reports"
+echo ""
+echo "Main result files:"
+echo "- sample_gene_counts.txt: Gene-level expression counts"
+echo "- sample_gene_abundances.tab: Gene abundance estimates"
+echo "- sample_coverage.bw: Genome coverage tracks"
+
+\bio

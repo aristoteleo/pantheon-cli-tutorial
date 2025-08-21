@@ -1,0 +1,118 @@
+🧬 Domain-Specific Tool Invocation Demonstration
+
+# Bioinformatics Toolkit Showcase
+
+## RNA-seq Upstream Analysis
+$ /bio rna init
+✅ Initialize RNA-seq project structure
+📁 Create directories: fastq/, qc/, alignment/, quantification/
+
+$ /bio rna upstream ./rna_data
+🔍 Detecting species and genome resources...
+📊 Starting RNA-seq upstream analysis pipeline
+
+Phase 0: Project initialization and dependency checking
+✅ Check tools: fastqc, STAR, featureCounts
+✅ Setup genome resources
+
+Phase 1: Quality control
+🧪 Running FastQC analysis...
+📈 Generate quality report: qc/fastqc_report.html
+
+Phase 2: Sequence alignment
+🎯 STAR genome alignment...
+📊 Mapping rate: 85.3% (good)
+
+Phase 3: Gene quantification
+📊 featureCounts gene quantification...
+✅ Generate expression matrix: counts_matrix.txt
+
+## ATAC-seq Upstream Analysis
+$ /bio atac init
+✅ Initialize ATAC-seq project structure
+📁 Create chromatin accessibility analysis environment
+
+$ /bio atac upstream ./atac_data
+🔍 ATAC-seq specific analysis started...
+
+Phase 1: Quality control and preprocessing
+📊 FastQC quality control check
+✂️ Adapter sequence trimming
+
+Phase 2: Genome alignment
+🎯 Bowtie2 alignment (ATAC-optimized parameters)
+🧹 BAM file filtering and deduplication
+
+Phase 3: Peak detection
+📈 MACS2 peak calling...
+🔍 Detected 15,432 accessibility peaks
+📊 Generate coverage tracks
+
+## Single-cell RNA-seq Analysis
+$ /bio scrna init
+✅ Single-cell analysis environment preparation
+🧬 omicverse integration ready
+
+$ /bio scrna analysis ./sc_data.h5ad
+📊 Load single-cell data: (5000 cells, 20000 genes)
+
+Phase 1: Quality control
+🔍 Cell quality control metrics calculation...
+🧹 Filter low-quality cells: 4876 cells retained
+
+Phase 2: Data preprocessing
+📊 Normalization and feature selection
+📈 Principal component analysis complete
+
+Phase 3: Cell clustering
+🎯 Discover 8 cell clusters
+📊 UMAP dimensionality reduction visualization
+
+Phase 4: Cell type annotation
+🤖 Automatic cell type annotation
+✅ Identified: T cells, B cells, macrophages, etc.
+
+## Molecular Docking Analysis (NEW VERSION)
+$ /bio dock init
+✅ Molecular docking environment initialization
+🧪 Python vina API ready
+
+$ dock.Dock_Workflow("check_dependencies")
+📦 Check dependencies: meeko, vina
+✅ All dependencies installed
+
+$ dock.Dock_Workflow("prepare_receptor")
+🧬 Protein receptor preprocessing...
+📝 Generate script: scripts/prepare_receptor.py
+⚡ Convert PDB → PDBQT format
+
+$ dock.Dock_Workflow("batch_docking")
+🎯 Batch molecular docking execution...
+📊 Docking score: -8.5 kcal/mol (strong binding)
+📈 Generate 20 binding conformations
+
+Analysis Complete:
+🏆 Top binding pose: -8.5 kcal/mol
+🔬 Key interactions: 3 hydrogen bonds, 5 hydrophobic contacts
+📊 Binding site: ASP123, TYR456, PHE789
+
+## Spatial Transcriptomics Analysis
+$ /bio spatial init
+✅ Spatial omics analysis preparation
+📍 High-resolution cellular-level analysis
+
+$ /bio spatial bin2cell ./spatial_data
+🎯 Bin2Cell cell segmentation...
+📊 Detected 2,847 cells
+🗺️ Spatial expression pattern recognition
+
+## Workflow Features Showcase
+✅ TODO management system - Automated task lists
+🔄 Persistent state - Variable preservation and memory optimization
+🔍 Dependency checking - Automatic installation and configuration
+⚡ Automated execution - No user confirmation required
+
+Current Status: All bioinformatics workflows ready
+Available: RNA-seq, ATAC-seq, scRNA-seq, Molecular Docking, Spatial
+Memory: Variables persistent across sessions
+Mode: Production-ready analysis environment

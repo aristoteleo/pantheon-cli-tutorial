@@ -1,4 +1,4 @@
-# 界面介绍
+# Interface Introduction
 
 $ pantheon-cli
 Aristotle © 2025

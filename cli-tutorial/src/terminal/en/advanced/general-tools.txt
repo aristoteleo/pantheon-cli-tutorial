@@ -1,0 +1,337 @@
+## Shell Command Execution Demonstration
+$ Run ls -la to view current directory
+Executing shell command: ls -la
+
+total 64
+drwxr-xr-x  12 user  staff   384 Jan 15 10:30 .
+drwxr-xr-x   8 user  staff   256 Jan 15 09:15 ..
+-rw-r--r--   1 user  staff  2048 Jan 15 10:25 analysis.py
+-rw-r--r--   1 user  staff  4096 Jan 15 10:30 data.csv
+drwxr-xr-x   5 user  staff   160 Jan 15 09:45 results/
+
+✓ Command executed successfully
+
+$ Create new shell and run Python script
+Creating new shell session...
+✓ Shell ID: shell_001
+
+Running command: python analysis.py --input data.csv
+Executing analysis script...
+Loading data: 1000 rows × 15 columns
+Data preprocessing complete
+Running statistical analysis...
+Generating visualization charts...
+✓ Analysis complete, results saved to results/
+
+## File Operations Demonstration
+$ Display file tree structure of current project
+Executing list_file_tree...
+
+project/
+├── data/
+│   ├── raw/
+│   │   ├── sample1.csv
+│   │   └── sample2.csv
+│   └── processed/
+│       └── merged_data.csv
+├── scripts/
+│   ├── preprocess.py
+│   ├── analysis.py
+│   └── visualize.py
+├── results/
+│   ├── figures/
+│   └── tables/
+├── config.yaml
+└── README.md
+
+✓ File tree generation complete
+
+$ Batch move CSV files to results directory
+Creating directory: results/csv_files/
+✓ Directory created successfully
+
+Finding all CSV files...
+Found 5 CSV files
+
+Moving files:
+- moving data1.csv → results/csv_files/
+- moving data2.csv → results/csv_files/
+- moving summary.csv → results/csv_files/
+- moving output.csv → results/csv_files/
+- moving report.csv → results/csv_files/
+
+✓ All files moved successfully
+
+## Text Search and Editing Demonstration
+$ Search for "TODO" markers in all Python files
+Executing grep "TODO" --pattern "*.py"...
+
+scripts/preprocess.py:
+  Line 45: # TODO: Add outlier handling
+  Line 89: # TODO: Optimize memory usage
+
+scripts/analysis.py:
+  Line 23: # TODO: Implement parallel computing
+  Line 156: # TODO: Add more statistical tests
+
+scripts/visualize.py:
+  Line 67: # TODO: Improve color scheme
+
+✓ Found 5 matches
+
+$ Edit config.yaml, add new configuration at line 10
+Reading file config.yaml...
+Current line 10 content: "  threads: 4"
+
+Executing insert_at_line...
+Insert content: "  cache_enabled: true"
+
+✓ Configuration added at line 11
+
+## Python Code Execution Demonstration
+$ Run Python code for data analysis
+Executing run_python_code:
+```python
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load data
+df = pd.read_csv('data.csv')
+print(f"Data shape: {df.shape}")
+
+# Basic statistics
+stats = df.describe()
+print("\nStatistical summary:")
+print(stats)
+
+# Correlation analysis
+corr = df.corr()
+print(f"\nHighest correlation: {corr.unstack().sort_values()[-2]:.3f}")
+
+# Generate charts
+plt.figure(figsize=(10, 6))
+df['value'].hist(bins=30)
+plt.title('Data Distribution')
+plt.savefig('distribution.png')
+print("\nChart saved: distribution.png")
+```
+
+Output:
+Data shape: (1000, 8)
+
+Statistical summary:
+       value     score      time
+count  1000.0   1000.0    1000.0
+mean   50.234   75.123    12.456
+std    15.678   12.345     3.234
+min    10.123   45.678     5.123
+25%    40.234   67.890     10.234
+50%    50.456   75.234     12.345
+75%    60.123   82.456     14.567
+max    95.678   98.765     22.345
+
+Highest correlation: 0.856
+
+Chart saved: distribution.png
+
+✓ Python code execution complete
+
+## R Code Execution Demonstration
+$ Use R for statistical analysis
+Executing run_r_code:
+```r
+# Load data
+data <- read.csv("data.csv")
+cat("Data dimensions:", dim(data), "\n")
+
+# t-test
+group1 <- data$value[data$group == "A"]
+group2 <- data$value[data$group == "B"]
+t_result <- t.test(group1, group2)
+print(t_result)
+
+# Linear regression
+model <- lm(value ~ score + time, data = data)
+summary(model)
+```
+
+Output:
+Data dimensions: 1000 8
+
+	Welch Two Sample t-test
+
+data:  group1 and group2
+t = 3.456, df = 498.23, p-value = 0.0006
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 2.123 7.890
+sample estimates:
+mean of x mean of y 
+   52.345    47.234
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  10.234     2.345   4.365  1.5e-05 ***
+score         0.523     0.045  11.234  < 2e-16 ***
+time          1.234     0.123  10.032  < 2e-16 ***
+
+✓ R analysis complete
+
+## Jupyter Notebook Operations Demonstration
+$ Create new analysis notebook
+Executing create_notebook "analysis.ipynb"...
+✓ Notebook created successfully
+
+Adding title cell...
+✓ Added Markdown cell: "# Data Analysis Report"
+
+Adding code cell...
+✓ Added code: Data loading and preprocessing
+
+Adding visualization cell...
+✓ Added code: Chart generation
+
+Apply machine learning template...
+Executing add_notebook_template...
+✓ Added template: Contains 5 standard analysis steps
+
+Notebook structure:
+1. [Markdown] Title and introduction
+2. [Code] Import libraries
+3. [Code] Data loading
+4. [Code] Data exploration
+5. [Code] Feature engineering
+6. [Code] Model training
+7. [Code] Results evaluation
+8. [Markdown] Conclusions
+
+✓ Notebook preparation complete
+
+## PDF Processing Demonstration
+$ Read paper.pdf extract methods section
+Executing read_pdf "paper.pdf"...
+✓ PDF loaded successfully (32 pages)
+
+Searching "Methods" section...
+Found methods section: pages 8-12
+
+Extracted content:
+"""
+3. Methods
+
+3.1 Data Collection
+We collected samples from 50 participants...
+
+3.2 Experimental Design
+The experiment consisted of three phases...
+
+3.3 Statistical Analysis
+All analyses were performed using R version 4.2...
+"""
+
+✓ Methods section extraction complete
+
+## Web Content Retrieval Demonstration
+$ Reference https://docs.scipy.org/doc/scipy/tutorial/stats.html
+Executing web_fetch...
+Retrieving URL content...
+✓ Successfully retrieved webpage (15,234 characters)
+
+Parsing content...
+Extracted key information:
+- Statistical functions overview
+- Probability distributions
+- Hypothesis testing methods
+- Example code
+
+Generate example code based on documentation:
+```python
+from scipy import stats
+
+# Normality test
+statistic, pvalue = stats.normaltest(data)
+
+# t-test
+t_stat, p_val = stats.ttest_ind(sample1, sample2)
+
+# Linear regression
+slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+```
+
+✓ Documentation content extracted and example code generated
+
+## Todo Task Management Demonstration
+$ Create data analysis workflow
+Executing add_todo...
+
+Adding task list:
+1. Data acquisition and cleaning
+2. Exploratory data analysis
+3. Feature engineering
+4. Model selection and training
+5. Model evaluation
+6. Results visualization
+7. Generate report
+
+✓ 7 tasks added
+
+$ Display current task status
+Executing show_todos...
+
+╭─────────────────────────────────────────╮
+│ # │ Task                  │ Status      │ Progress │
+├─────────────────────────────────────────┤
+│ 1 │ Data acquisition      │ In progress │ 60%     │
+│ 2 │ Exploratory analysis  │ Pending     │ 0%      │
+│ 3 │ Feature engineering   │ Pending     │ 0%      │
+│ 4 │ Model training        │ Pending     │ 0%      │
+│ 5 │ Model evaluation      │ Pending     │ 0%      │
+│ 6 │ Results visualization │ Pending     │ 0%      │
+│ 7 │ Generate report       │ Pending     │ 0%      │
+╰─────────────────────────────────────────╯
+
+$ Complete current task and start next one
+Executing mark_task_done...
+✓ Task 1 completed: Data acquisition and cleaning
+
+Executing work_on_next_todo...
+Starting task 2: Exploratory data analysis
+
+Auto-executing:
+- Load cleaned data
+- Calculate descriptive statistics
+- Generate distribution plots
+- Correlation analysis
+
+✓ Task 2 in progress...
+
+## Combined Tool Execution Demonstration
+$ Execute complete literature processing workflow
+Starting combined tool execution...
+
+Step 1: List PDF files
+Executing glob "papers/*.pdf"...
+Found 12 PDF files
+
+Step 2: Batch read PDFs
+Processing file 1/12: paper1.pdf
+Extracting title, abstract, methods...
+Processing file 2/12: paper2.pdf
+Extracting title, abstract, methods...
+[...]
+
+Step 3: Search for specific methods
+Executing search_in_file "machine learning"...
+Found 8 papers containing relevant methods
+
+Step 4: Create literature review document
+Executing create_file "literature_review.md"...
+Writing review content...
+
+Step 5: Generate citation list
+Formatting citations...
+Adding to document...
+
+✓ Literature processing workflow complete!
+Output: literature_review.md (5,234 words)

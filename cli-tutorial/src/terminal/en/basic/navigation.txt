@@ -1,0 +1,97 @@
+# Show current directory
+$ pantheon pwd
+> /Users/demo/pantheon-projects/data-analysis
+
+---
+
+# List files and directories
+$ pantheon ls
+> data/
+>   sales_2024.csv      (2.3 MB)
+>   customers.json      (456 KB)
+>   products.xlsx       (128 KB)
+> scripts/
+>   analysis.pan        (3.2 KB)
+>   preprocessing.py    (5.1 KB)
+> output/
+>   report_january.html (234 KB)
+>   charts/
+> README.md             (4.5 KB)
+> pantheon.yaml         (1.2 KB)
+
+---
+
+# Detailed list
+$ pantheon ls -la
+> total 3456
+> drwxr-xr-x   8 user  staff     256 Mar 15 10:30 .
+> drwxr-xr-x  15 user  staff     480 Mar 14 09:15 ..
+> drwxr-xr-x   5 user  staff     160 Mar 15 10:25 data
+> drwxr-xr-x   4 user  staff     128 Mar 14 15:30 scripts
+> drwxr-xr-x   6 user  staff     192 Mar 15 10:30 output
+> -rw-r--r--   1 user  staff    4608 Mar 14 09:20 README.md
+> -rw-r--r--   1 user  staff    1234 Mar 14 09:15 pantheon.yaml
+> -rw-r--r--   1 user  staff     567 Mar 15 10:28 .gitignore
+
+---
+
+# Change directory
+$ pantheon cd data
+> 📁 Entering directory: /Users/demo/pantheon-projects/data-analysis/data
+
+$ pantheon ls
+> sales_2024.csv      (2.3 MB)    Last modified: 2024-03-15 10:25
+> customers.json      (456 KB)    Last modified: 2024-03-14 15:20  
+> products.xlsx       (128 KB)    Last modified: 2024-03-13 09:10
+> backup/
+>   sales_2024_backup.csv
+
+---
+
+# Show directory tree
+$ pantheon tree --depth 2
+> .
+> ├── 📁 data/
+> │   ├── 📄 sales_2024.csv
+> │   ├── 📄 customers.json
+> │   ├── 📄 products.xlsx
+> │   └── 📁 backup/
+> ├── 📁 scripts/
+> │   ├── 📄 analysis.pan
+> │   ├── 📄 preprocessing.py
+> │   └── 📁 modules/
+> ├── 📁 output/
+> │   ├── 📄 report_january.html
+> │   ├── 📄 summary.pdf
+> │   └── 📁 charts/
+> ├── 📄 README.md
+> ├── 📄 pantheon.yaml
+> └── 📄 .gitignore
+
+---
+
+# Create and manage bookmarks
+$ pantheon bookmark add data-dir /Users/demo/pantheon-projects/data-analysis/data
+> ✅ Bookmark created: data-dir -> /Users/demo/pantheon-projects/data-analysis/data
+
+$ pantheon bookmark list
+> 📌 Saved bookmarks:
+>   data-dir    -> /Users/demo/pantheon-projects/data-analysis/data
+>   scripts     -> /Users/demo/pantheon-projects/data-analysis/scripts
+>   output      -> /Users/demo/pantheon-projects/data-analysis/output
+>   home        -> /Users/demo
+
+$ pantheon goto data-dir
+> 🚀 Jump to: /Users/demo/pantheon-projects/data-analysis/data
+
+---
+
+# Search files
+$ pantheon find . -name "*.csv"
+> Search results:
+> ./data/sales_2024.csv
+> ./data/backup/sales_2024_backup.csv
+> ./output/processed_data.csv
+> ./temp/cache_data.csv
+> 
+> Found 4 files
