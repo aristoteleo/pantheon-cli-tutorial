@@ -1,10 +1,13 @@
 <template>
   <div class="tutorial-view">
-    <div class="content-section" :class="{ 'full-width': !shouldShowTerminal }">
+    <div class="content-section" :class="{ 'full-width': !shouldShowRightPanel }">
       <TutorialContent />
     </div>
-    <div class="terminal-section" v-if="shouldShowTerminal">
-      <Terminal />
+    <div class="right-panel-section" v-if="shouldShowRightPanel">
+      <VideoPlayer v-if="shouldShowVideo" />
+      <div class="terminal-wrapper" v-else>
+        <Terminal />
+      </div>
     </div>
   </div>
 </template>
@@ -14,18 +17,42 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import TutorialContent from '../components/TutorialContent.vue'
 import Terminal from '../components/Terminal.vue'
+import VideoPlayer from '../components/VideoPlayer.vue'
 
 const route = useRoute()
 
-// 定义不需要显示终端的页面
-const noTerminalPages = [
+// 定义不需要显示右侧面板的页面
+const noRightPanelPages = [
   '/advanced/tool-details',
   '/release-notes',
   '/join-us'
 ]
 
+// 定义需要显示视频的页面（真实案例）
+const videoPages = [
+  '/cases/social-behavior',
+  '/cases/customs-finance',
+  '/cases/scrna-complex',
+  '/cases/scllm',
+  '/cases/hd-10x',
+  '/cases/atac-upstream',
+  '/cases/rna-upstream',
+  '/cases/molecular-docking',
+  '/cases/mixed-python-r',
+  '/cases/seurat-llm-annotation'
+]
+
+const shouldShowRightPanel = computed(() => {
+  return !noRightPanelPages.includes(route.path)
+})
+
+const shouldShowVideo = computed(() => {
+  return videoPages.includes(route.path)
+})
+
+// 兼容性：保持原有的 shouldShowTerminal 计算属性
 const shouldShowTerminal = computed(() => {
-  return !noTerminalPages.includes(route.path)
+  return shouldShowRightPanel.value && !shouldShowVideo.value
 })
 </script>
 
@@ -56,11 +83,16 @@ const shouldShowTerminal = computed(() => {
   border-right: none;
 }
 
-.terminal-section {
+.right-panel-section {
   flex: 1 1 50%;
   min-width: 50%;
   max-width: 50%;
   background: var(--main-bg);
+  height: 100%;
+  overflow: hidden;
+}
+
+.terminal-wrapper {
   padding: 20px;
   height: 100%;
   overflow: hidden;

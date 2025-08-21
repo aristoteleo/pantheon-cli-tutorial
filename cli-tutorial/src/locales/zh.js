@@ -61,6 +61,15 @@ export default {
     welcome: '欢迎使用 Pantheon-CLI 教程终端演示',
     hint: '点击左侧菜单查看对应的命令示例'
   },
+  video: {
+    demo: '真实案例演示',
+    realCase: '基于真实Pantheon CLI会话记录',
+    comingSoon: '真实案例视频演示',
+    description: '展示完整的Pantheon CLI分析流程',
+    realAnalysis: '真实分析场景',
+    naturalLanguage: '自然语言交互',
+    stepByStep: '分步骤演示'
+  },
   content: {
     introduction: {
       title: 'CLI 工具介绍',
