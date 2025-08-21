@@ -115,7 +115,7 @@ const expandedSections = reactive({})
 
 const loadNavigation = async () => {
   try {
-    const response = await fetch('/src/config/navigation.yaml')
+    const response = await fetch('/navigation.yaml')
     const yamlText = await response.text()
     const config = yaml.load(yamlText)
     

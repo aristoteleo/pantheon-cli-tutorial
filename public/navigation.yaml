@@ -1,0 +1,97 @@
+navigation:
+  - key: introduction
+    children:
+      - path: /
+        key: introOverview
+      - path: /intro/what-is-cli
+        key: introWhatIs
+      - path: /intro/why-cli
+        key: introWhy
+      - path: /intro/getting-started
+        key: introGettingStarted
+  
+  - key: installation
+    children:
+      - path: /installation
+        key: installOverview
+      - path: /installation/requirements
+        key: installRequirements
+      - key: installDetail
+        children:
+          - path: /installation/detail/windows
+            key: installWindows
+          - path: /installation/detail/macos
+            key: installMacos
+          - path: /installation/detail/linux
+            key: installLinux
+      - path: /installation/model-config
+        key: installModelConfig
+      - path: /installation/knowledge-base
+        key: installKnowledgeBase
+      - path: /installation/verify
+        key: installVerify
+  
+  - key: basicCommands
+    children:
+      - path: /basic-commands
+        key: basicOverview
+      - path: /basic/system-commands
+        key: basicSystemCommands
+      - path: /basic/dialog-commands
+        key: basicDialogCommands
+      - path: /basic/program-commands
+        key: basicProgramCommands
+  
+  - key: advancedUsage
+    children:
+      - path: /advanced-usage
+        key: advancedOverview
+      - path: /advanced/general-tools
+        key: advancedGeneralTools
+      - path: /advanced/domain-tools
+        key: advancedDomainTools
+      - path: /advanced/tool-details
+        key: advancedToolDetails
+  
+  - key: realCases
+    children:
+      - path: /cases/social-behavior
+        key: caseSocialBehavior
+      - path: /cases/customs-finance
+        key: caseCustomsFinance
+      - path: /cases/scrna-complex
+        key: caseScRnaComplex
+      - path: /cases/scllm
+        key: caseScLlm
+      - path: /cases/hd-10x
+        key: caseHd10x
+      - path: /cases/atac-upstream
+        key: caseAtacUpstream
+      - path: /cases/rna-upstream
+        key: caseRnaUpstream
+      - path: /cases/molecular-docking
+        key: caseMolecularDocking
+      - path: /cases/mixed-python-r
+        key: caseMixedPythonR
+      - path: /cases/seurat-llm-annotation
+        key: caseSeuratLlmAnnotation
+  
+  - key: troubleshooting
+    children:
+      - path: /troubleshooting
+        key: troubleOverview
+      - path: /trouble/common-errors
+        key: troubleCommonErrors
+      - path: /trouble/debugging
+        key: troubleDebugging
+      - path: /trouble/faq
+        key: troubleFaq
+  
+  - key: releaseNotes
+    path: /release-notes
+  
+  - key: github
+    url: https://github.com/aristoteleo/pantheon-cli
+  
+  - key: joinUs
+    path: /join-us
