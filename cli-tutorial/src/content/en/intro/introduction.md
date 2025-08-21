@@ -13,13 +13,13 @@ Pantheon-CLI is the first fully open-source, infinitely extensible scientific "v
 ### **PhD-Level Scientific Assistant**
 Pantheon-CLI is the first command-line intelligent agent assistant for complex real-world scientific analysis, capable of handling PhD-level single-cell and spatial genomics tasks, along with many other cutting-edge scientific challenges. This is not just a tool—it's an AI scientist on your research team.
 
-### **Hybrid Programming Magic** 
+### **Mixed Programming Magic** 
 With Pantheon-CLI, you can work within the same environment to:
 - Write Python code on the first line
 - Use natural language descriptions on the next line
 - Even mix in R/Julia languages
 
-All scientists need only focus on the analysis itself, without switching between different tools and environments. This hybrid programming paradigm makes data science more fluid than ever before.
+All scientists need only focus on the analysis itself, without switching between different tools and environments. This Mixed programming paradigm makes data science more fluid than ever before.
 
 ### **Open Source, Powerful, Python-First**
 - **Fully Open Source** - The first completely open-source scientific AI analysis framework with transparent, auditable source code

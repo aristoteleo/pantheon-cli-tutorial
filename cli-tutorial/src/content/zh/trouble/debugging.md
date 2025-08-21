@@ -213,6 +213,10 @@ echo "=== Python版本 ===" >> diagnostic.txt
 python --version >> diagnostic.txt
 echo "" >> diagnostic.txt
 
+echo "=== Pantheon-CLI版本 ===" >> diagnostic.txt
+pantheon-cli --version >> diagnostic.txt
+echo "" >> diagnostic.txt
+
 echo "=== 已安装包 ===" >> diagnostic.txt
 pip list >> diagnostic.txt
 echo "" >> diagnostic.txt
@@ -271,6 +275,39 @@ except ImportError:
     print("numpy未安装，请运行: pip install numpy")
 ```
 
+## 环境调试
+
+### 检查Python环境
+
+```bash
+# 检查Python版本
+python --version
+
+# 检查pip版本
+pip --version
+
+# 检查已安装包
+pip list | grep -E "(pandas|numpy|matplotlib)"
+
+# 检查包版本兼容性
+pip check
+```
+
+### 虚拟环境调试
+
+```bash
+# 检查是否在虚拟环境中
+echo $VIRTUAL_ENV
+
+# 如果需要，创建新的虚拟环境
+python -m venv tutorial-env
+source tutorial-env/bin/activate  # Linux/macOS
+# 或 tutorial-env\Scripts\activate  # Windows
+
+# 安装依赖包
+pip install pandas numpy matplotlib seaborn scikit-learn
+```
+
 ## 调试最佳实践
 
 ### 1. 系统化调试
@@ -304,6 +341,41 @@ def process_data(data, threshold=0.5):
     if not 0 <= threshold <= 1:
         raise ValueError("threshold必须在0-1之间")
     # 处理逻辑...
+```
+
+## 工具特定调试
+
+### Pantheon-CLI 教程工具
+
+**记住**：Pantheon-CLI 是一个教程工具，它：
+- 只有一个命令：`pantheon-cli --version`
+- 提供一个网页终端环境用于学习
+- 所有的数据分析都在终端环境内使用标准的Python、R和shell命令进行
+
+**常见误解**：
+```bash
+# 错误：不存在这些命令
+pantheon analyze data.csv     # 不存在
+pantheon config show         # 不存在
+
+# 正确：在终端环境中使用标准命令
+python -c "import pandas; print(pandas.__version__)"
+python analyze_data.py
+R --version
+```
+
+### 教程环境特定问题
+
+```bash
+# 检查教程环境中的Python
+which python
+python --version
+
+# 检查可用的数据文件
+ls -la *.csv *.txt *.json
+
+# 测试基本功能
+python -c "print('Hello, Pantheon-CLI tutorial!')"
 ```
 
 通过系统化的调试方法，可以快速定位和解决问题，提高学习效率。

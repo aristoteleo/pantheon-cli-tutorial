@@ -14,4 +14,4 @@ If you mention tool function names in the conversation, Pantheon-CLI will direct
 
 ## 3. Program Commands
 
-Since Pantheon-CLI is a hybrid programming terminal, compared to other CLIs, Pantheon-CLI supports directly running `Python`, `R`, and `Julia` code, and these variables are saved during program execution. They can be used by `dialog commands`, and variables from `dialog commands` can also be directly used. It's a mutual process.
+Since Pantheon-CLI is a Mixed programming terminal, compared to other CLIs, Pantheon-CLI supports directly running `Python`, `R`, and `Julia` code, and these variables are saved during program execution. They can be used by `dialog commands`, and variables from `dialog commands` can also be directly used. It's a mutual process.

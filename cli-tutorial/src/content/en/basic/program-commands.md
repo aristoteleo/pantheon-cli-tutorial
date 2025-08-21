@@ -1,6 +1,6 @@
 # Program Commands
 
-Pantheon-CLI supports direct execution of various programming language code, achieving a true hybrid programming environment. Whether it's Python, R, Julia, or Shell commands, they can all be executed seamlessly within the same session.
+Pantheon-CLI supports direct execution of various programming language code, achieving a true Mixed programming environment. Whether it's Python, R, Julia, or Shell commands, they can all be executed seamlessly within the same session.
 
 ## 1. Python Programming Support
 
@@ -71,7 +71,7 @@ For shell commands, we only need to add `!` before running, then this command wi
 
 - Interactive execution: Execute code line by line, view results instantly.
 - Script mode: Execute complete analysis scripts.
-- Hybrid mode: Mixed mode of natural language description + code execution.
+- Mixed mode: Mixed mode of natural language description + code execution.
 
 ## 6. Variable and State Management
 

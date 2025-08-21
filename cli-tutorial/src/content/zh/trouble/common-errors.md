@@ -1,315 +1,359 @@
 # 常见错误
 
-本页面列出了使用Pantheon-CLI教程时最常见的错误及其解决方案。
+本页面列出了使用Pantheon-CLI教程工具时最常见的错误及其解决方案。
 
-## 网页终端错误
+## 安装错误
 
-### 错误：终端无法加载
-**症状**：
-- 页面显示空白的终端区域
-- 终端界面不响应
+### 错误：Python版本不兼容
+```bash
+ERROR: Package 'pantheon-cli' requires Python '>=3.8' but the running Python is 3.7.x
+```
 
 **解决方案**：
 ```bash
-# 1. 刷新页面
-按 Ctrl+F5 (Windows/Linux) 或 Cmd+Shift+R (macOS)
+# 检查Python版本
+python --version
+python3 --version
 
-# 2. 清除浏览器缓存
-# Chrome: 设置 → 隐私设置和安全性 → 清除浏览数据
-# Firefox: 设置 → 隐私与安全 → 清除数据
+# 安装Python 3.8+
+# Ubuntu/Debian
+sudo apt update && sudo apt install python3.8
 
-# 3. 检查浏览器控制台错误
-按 F12 → Console 标签
+# macOS (使用Homebrew)
+brew install python@3.8
+
+# Windows: 从python.org下载安装
 ```
 
-### 错误：命令执行后无输出
-**症状**：
-- 输入命令后没有任何显示
-- 光标不移动或无响应
+### 错误：pip安装失败
+```bash
+ERROR: Could not find a version that satisfies the requirement pantheon-cli
+```
 
 **解决方案**：
 ```bash
-# 1. 等待几秒钟（某些命令需要处理时间）
+# 升级pip
+pip install --upgrade pip
 
-# 2. 检查命令是否正确
-python --version   # 正确
-python version     # 错误
+# 使用Python 3的pip
+pip3 install pantheon-cli
 
-# 3. 尝试简单命令测试
-echo "Hello World"
-ls
-pwd
+# 用户级安装
+pip install --user pantheon-cli
+
+# 如果网络问题，使用国内镜像
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pantheon-cli
 ```
 
-## 浏览器兼容性错误
+### 错误：权限被拒绝
+```bash
+Permission denied: '/usr/local/bin/pantheon'
+```
 
-### 错误：JavaScript功能不工作
-**症状**：
-- 终端完全无法交互
-- 页面功能异常
-
-**解决方案**：
-1. **更新浏览器**到最新版本
-2. **禁用浏览器扩展**（特别是广告拦截器）
-3. **尝试无痕模式**：
-   - Chrome: Ctrl+Shift+N
-   - Firefox: Ctrl+Shift+P
-   - Safari: Cmd+Shift+N
-
-### 错误：复制粘贴不工作
 **解决方案**：
 ```bash
-# 方法1：标准快捷键
-Ctrl+C (复制) / Ctrl+V (粘贴)   # Windows/Linux
-Cmd+C (复制) / Cmd+V (粘贴)     # macOS
+# 方法1：用户级安装（推荐）
+pip install --user pantheon-cli
 
-# 方法2：如果快捷键不工作
-Ctrl+Shift+C / Ctrl+Shift+V    # Linux终端风格
-右键菜单选择复制/粘贴
+# 添加用户bin目录到PATH
+export PATH="$HOME/.local/bin:$PATH"
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 
-# 方法3：浏览器菜单
-编辑 → 复制/粘贴
+# 方法2：使用sudo（不推荐）
+sudo pip install pantheon-cli
 ```
 
-## 数据处理错误
+## 运行时错误
 
-### 错误：文件未找到
+### 错误：命令未找到
+```bash
+bash: pantheon-cli: command not found
+```
+
+**解决方案**：
+```bash
+# 检查是否安装
+pip show pantheon-cli
+
+# 检查安装位置
+which pantheon-cli
+whereis pantheon-cli
+
+# 添加到PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# 或直接运行
+python -m pantheon_cli --version
+```
+
+### 错误：模块导入失败
+```bash
+ModuleNotFoundError: No module named 'pandas'
+```
+
+**解决方案**：
+```bash
+# 安装缺失的依赖
+pip install pandas numpy matplotlib seaborn
+
+# 安装生物信息学相关包
+pip install scanpy anndata biopython
+
+# 批量安装（如果有requirements.txt）
+pip install -r requirements.txt
+
+# 创建虚拟环境（推荐）
+python -m venv pantheon-env
+source pantheon-env/bin/activate  # Linux/macOS
+# 或 pantheon-env\Scripts\activate  # Windows
+pip install pantheon-cli
+```
+
+## 教程环境错误
+
+### 错误：终端无响应
+```bash
+# 浏览器中的终端停止响应
+```
+
+**解决方案**：
+```bash
+# 1. 打开浏览器开发者工具（F12）检查错误
+# 2. 刷新页面
+#    Ctrl+F5 (Windows/Linux) 或 Cmd+Shift+R (macOS)
+# 3. 清理浏览器缓存
+# 4. 重启浏览器
+# 5. 测试简单命令
+echo "测试终端响应"
+```
+
+### 错误：Python包不可用
+```bash
+ImportError: No module named 'pandas'
+# 在教程环境中
+```
+
+**解决方案**：
+```bash
+# 检查教程环境中的Python
+python --version
+python -c "import sys; print(sys.executable)"
+
+# 检查已安装包
+python -c "import pandas, numpy, matplotlib; print('基础包可用')"
+
+# 如果包缺失，这可能是教程环境的限制
+# 联系教程提供者或检查文档
+```
+
+### 错误：文件访问问题
 ```bash
 FileNotFoundError: [Errno 2] No such file or directory: 'data.csv'
 ```
 
 **解决方案**：
-```python
-# 1. 检查当前目录
-import os
-print("当前目录:", os.getcwd())
-print("目录内容:", os.listdir('.'))
-
-# 2. 检查文件是否存在
-import os
-if os.path.exists('data.csv'):
-    print("文件存在")
-else:
-    print("文件不存在")
-
-# 3. 使用正确的文件路径
-# 如果文件在data子目录中
-df = pd.read_csv('data/data.csv')
-```
-
-### 错误：模块未找到
 ```bash
-ModuleNotFoundError: No module named 'pandas'
-```
+# 检查当前目录
+pwd
 
-**说明**：在网页教程中，常用的数据科学包（pandas, numpy, matplotlib等）应该已经预装。如果遇到此错误：
+# 列出可用文件
+ls -la
 
-**解决方案**：
-```python
-# 1. 检查是否是拼写错误
-import pandas as pd      # 正确
-import panda as pd       # 错误拼写
+# 使用教程提供的示例数据
+ls *.csv *.txt *.json
 
-# 2. 检查导入方式
-import numpy as np       # 正确
-import numpy            # 也正确，但推荐使用别名
-
-# 3. 如果确实缺少模块，在本地环境中安装
-# (仅限本地环境，网页教程中不适用)
-pip install pandas numpy matplotlib
-```
-
-## Python代码错误
-
-### 错误：语法错误
-```python
-SyntaxError: invalid syntax
-```
-
-**常见原因和解决方案**：
-```python
-# 1. 缺少冒号
-if x > 5          # 错误
-if x > 5:         # 正确
-
-# 2. 括号不匹配
-print("Hello"     # 错误：缺少右括号
-print("Hello")    # 正确
-
-# 3. 缩进错误
-if x > 5:
-print("大于5")    # 错误：缺少缩进
-    print("大于5")    # 正确
-
-# 4. 引号不匹配
-text = "Hello'    # 错误：引号不匹配
-text = "Hello"    # 正确
-text = 'Hello'    # 也正确
-```
-
-### 错误：变量未定义
-```python
-NameError: name 'variable_name' is not defined
-```
-
-**解决方案**：
-```python
-# 1. 在使用前定义变量
-print(x)          # 错误：x未定义
-x = 10
-print(x)          # 正确
-
-# 2. 检查变量名拼写
-data_frame = pd.DataFrame()
-print(data_fram)  # 错误：拼写错误
-print(data_frame) # 正确
-
-# 3. 检查作用域
-def my_function():
-    local_var = 10
-print(local_var)  # 错误：变量在函数外不可见
-```
-
-## 数据分析错误
-
-### 错误：键错误（列不存在）
-```python
-KeyError: 'column_name'
-```
-
-**解决方案**：
-```python
+# 或创建示例数据进行练习
+python -c "
 import pandas as pd
-
-# 1. 检查列名
-print(df.columns.tolist())  # 查看所有列名
-
-# 2. 检查列名拼写和大小写
-df['Age']        # 正确
-df['age']        # 如果列名是'Age'则错误
-df['AGE']        # 如果列名是'Age'则错误
-
-# 3. 安全地访问列
-if 'column_name' in df.columns:
-    result = df['column_name']
-else:
-    print("列不存在")
+import numpy as np
+data = pd.DataFrame({'x': np.random.randn(100), 'y': np.random.randn(100)})
+data.to_csv('sample_data.csv', index=False)
+print('创建示例数据文件: sample_data.csv')
+"
 ```
 
-### 错误：数据类型错误
-```python
-TypeError: unsupported operand type(s) for +: 'str' and 'int'
+## 常见误解错误
+
+### 错误：使用不存在的命令
+```bash
+# 错误的尝试
+pantheon analyze data.csv
+pantheon config show
+pantheon models list
 ```
 
 **解决方案**：
-```python
-# 1. 检查数据类型
-print(df.dtypes)          # 查看所有列的数据类型
-print(type(variable))     # 查看变量类型
+**记住**：Pantheon-CLI只有一个命令：`pantheon-cli --version`
+```bash
+# 正确的做法：在教程终端环境中使用标准命令
+# Python数据分析
+python -c "import pandas as pd; df = pd.read_csv('data.csv'); print(df.head())"
+python analyze_script.py
 
-# 2. 转换数据类型
-df['age'] = df['age'].astype(int)        # 转换为整数
-df['date'] = pd.to_datetime(df['date'])  # 转换为日期
+# R语言分析
+R --version
+Rscript analysis.R
 
-# 3. 处理字符串数字
-age_str = "25"
-age_int = int(age_str)    # 转换为整数
-result = age_int + 5      # 现在可以进行数学运算
+# Shell命令
+ls -la
+cat data.csv | head -5
+
+# 查看Pantheon-CLI版本（唯一的专用命令）
+pantheon-cli --version
 ```
 
-## 绘图错误
-
-### 错误：图形无法显示
-**在网页教程中，有时图形可能不显示**
+### 错误：期待AI自动分析功能
+```bash
+# 期待但不存在的功能
+pantheon "analyze my sales data and generate insights"
+```
 
 **解决方案**：
-```python
+Pantheon-CLI是一个**教程工具**，不是AI分析工具：
+```bash
+# 使用标准的数据分析方法
+# 在教程终端环境中练习这些技能
+
+# Python数据分析示例
+python -c "
+import pandas as pd
 import matplotlib.pyplot as plt
 
-# 1. 确保调用show()
-plt.plot([1, 2, 3, 4])
-plt.show()                # 必须调用show()
+# 读取数据
+data = pd.read_csv('sales_data.csv')
 
-# 2. 设置后端（如果需要）
-import matplotlib
-matplotlib.use('Agg')     # 用于保存图片
+# 基本统计
+print(data.describe())
 
-# 3. 保存图片而不是显示
-plt.plot([1, 2, 3, 4])
-plt.savefig('plot.png')   # 保存图片
+# 简单可视化
+data.plot(kind='hist')
+plt.savefig('sales_histogram.png')
+print('图表已保存为 sales_histogram.png')
+"
 ```
 
-## 网络和性能问题
+## 性能问题
 
-### 错误：页面加载缓慢
-**解决方案**：
-1. **检查网络连接**
-2. **关闭其他浏览器标签页**
-3. **清理浏览器缓存**
-4. **尝试不同时间段访问**
+### 问题：教程环境运行缓慢
+**诊断**：
+```bash
+# 检查浏览器性能
+# 1. 关闭不必要的标签页
+# 2. 检查浏览器内存使用（任务管理器）
+# 3. 清理浏览器缓存
+```
 
-### 错误：内存不足警告
-**在处理大数据时可能出现**
-
-**解决方案**：
+**优化**：
 ```python
-# 1. 分块读取数据
+# 在代码中优化性能
+import pandas as pd
+
+# 使用高效的数据类型
+df = df.astype({'int_col': 'int32', 'float_col': 'float32'})
+
+# 避免循环，使用向量化操作
+df['new_col'] = df['col1'] * df['col2']  # 高效
+# 避免: for i in range(len(df)): ...    # 低效
+
+# 及时释放内存
+import gc
+del large_dataframe
+gc.collect()
+```
+
+### 问题：浏览器内存不足
+```bash
+# 浏览器显示"页面无响应"或崩溃
+```
+
+**解决方案**：
+```bash
+# 1. 重启浏览器
+# 2. 增加虚拟内存（Windows）
+# 3. 使用较小的数据集练习
+# 4. 分批处理数据
+```
+
+```python
+# Python中分批处理数据
+import pandas as pd
+
+# 分块读取大文件
 chunk_size = 1000
 for chunk in pd.read_csv('large_file.csv', chunksize=chunk_size):
-    # 处理每个chunk
-    result = chunk.describe()
-
-# 2. 只读取需要的列
-df = pd.read_csv('data.csv', usecols=['col1', 'col2'])
-
-# 3. 优化数据类型
-df['int_col'] = df['int_col'].astype('int32')  # 使用较小的整数类型
+    # 处理每个数据块
+    result = chunk.groupby('category').mean()
+    print(f"处理了 {len(chunk)} 行数据")
 ```
 
-## 调试技巧
+## 学习相关错误
 
-### 使用print语句调试
+### 错误：期待过于复杂的功能
+```bash
+# 尝试过于高级的分析
+# "执行深度学习神经网络训练"
+```
+
+**解决方案**：
+Pantheon-CLI教程专注于基础学习：
 ```python
-# 在关键位置添加print语句
+# 从基础开始
+# 1. 数据加载和探索
+import pandas as pd
 data = pd.read_csv('data.csv')
-print("数据加载完成，形状:", data.shape)
+print(data.info())
 
-result = data.groupby('category').mean()
-print("分组计算完成，结果:", result.head())
+# 2. 基本统计分析
+print(data.describe())
+
+# 3. 简单可视化
+import matplotlib.pyplot as plt
+data.hist()
+plt.savefig('data_overview.png')
+
+# 4. 基础机器学习（如果环境支持）
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+# 等等...
 ```
 
-### 检查中间结果
-```python
-# 逐步检查计算过程
-step1 = data.dropna()
-print("删除缺失值后的行数:", len(step1))
+### 错误：不理解教程目的
+**问题**：将Pantheon-CLI误解为生产分析工具
 
-step2 = step1[step1['age'] > 18]
-print("过滤年龄后的行数:", len(step2))
-
-final_result = step2.groupby('gender').mean()
-print("最终结果:", final_result)
-```
+**澄清**：
+Pantheon-CLI是一个**教育工具**，旨在：
+1. **学习数据分析概念** - 通过实际操作理解概念
+2. **练习编程技能** - Python、R、shell命令
+3. **模拟真实环境** - 在安全的环境中实验
+4. **建立基础** - 为真实项目做准备
 
 ## 获取帮助
 
-如果问题仍未解决：
+### 如何有效报告问题
 
-1. **查看其他帮助页面**：
-   - [故障排除](./troubleshooting.md)
-   - [调试指南](./debugging.md)
-   - [常见问题FAQ](./faq.md)
+```bash
+# 收集诊断信息
+echo "=== 系统信息 ==="
+uname -a
+echo "=== Python版本 ==="
+python --version
+echo "=== Pantheon-CLI版本 ==="
+pantheon-cli --version 2>&1 || echo "pantheon-cli未安装"
+echo "=== 浏览器信息 ==="
+# 在浏览器控制台运行：navigator.userAgent
+```
 
-2. **检查浏览器控制台**：
-   - 按F12打开开发者工具
-   - 查看Console标签页的错误信息
+### 问题报告应包含：
+1. **完整错误信息** - 不要截取部分信息
+2. **重现步骤** - 详细的操作步骤
+3. **环境信息** - 操作系统、浏览器、Python版本
+4. **期望结果** - 你期望发生什么
+5. **实际结果** - 实际发生了什么
 
-3. **尝试简化问题**：
-   - 使用最简单的代码重现问题
-   - 逐步添加复杂度找出问题所在
+### 寻求帮助的渠道：
+1. **查看文档** - 仔细阅读教程和FAQ
+2. **GitHub Issues** - 搜索类似问题
+3. **社区论坛** - 与其他学习者讨论
+4. **Stack Overflow** - 使用相关标签
 
-4. **寻求帮助**：
-   - 在GitHub Issues中搜索类似问题
-   - 提交新的Issue并提供详细信息
-
-记住：编程学习中遇到错误是正常的，每个错误都是学习的机会！
+记住：详细准确的问题描述是获得有效帮助的关键！

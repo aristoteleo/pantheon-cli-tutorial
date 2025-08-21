@@ -1,6 +1,6 @@
 # Getting Started
 
-Experience the hybrid programming magic of Pantheon-CLI in just 5 minutes!
+Experience the Mixed programming magic of Pantheon-CLI in just 5 minutes!
 
 ## Installation Preparation
 
@@ -25,7 +25,7 @@ pantheon-cli
 
 The system will prompt you to configure an API key or select a local model. For quick experience, you can configure an OpenAI or Anthropic API key.
 
-## Experience Hybrid Programming
+## Experience Mixed Programming
 
 ### Perfect Integration of Natural Language and Python
 ```bash

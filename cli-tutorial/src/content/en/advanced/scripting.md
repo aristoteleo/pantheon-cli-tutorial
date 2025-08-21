@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
 ## Natural Language Scripts
 
-### Hybrid Mode Scripts
+### Mixed Mode Scripts
 ```pantheon
 # analysis.pan
 Load sales data from "sales_2024.csv"

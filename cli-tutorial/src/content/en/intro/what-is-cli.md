@@ -8,7 +8,7 @@ Pantheon-CLI is the first fully open-source "vibe analysis" framework, built spe
 
 Built-in intelligent agent designed specifically for scientific computing, capable of handling various complex data analysis tasks. The intelligent agent not only executes commands but also understands scientific context and provides professional-level analysis recommendations.
 
-### 1.2 Hybrid Programming Paradigm
+### 1.2 Mixed Programming Paradigm
 
 Seamlessly switch between multiple programming approaches within the same environment, supporting natural language descriptions of analysis needs, with the system automatically generating and executing corresponding Python, R, or Julia code.
 

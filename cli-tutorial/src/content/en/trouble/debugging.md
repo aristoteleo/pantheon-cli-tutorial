@@ -213,6 +213,10 @@ echo "=== Python Version ===" >> diagnostic.txt
 python --version >> diagnostic.txt
 echo "" >> diagnostic.txt
 
+echo "=== Pantheon-CLI Version ===" >> diagnostic.txt
+pantheon-cli --version >> diagnostic.txt
+echo "" >> diagnostic.txt
+
 echo "=== Installed Packages ===" >> diagnostic.txt
 pip list >> diagnostic.txt
 echo "" >> diagnostic.txt
@@ -271,6 +275,39 @@ except ImportError:
     print("numpy not installed, run: pip install numpy")
 ```
 
+## Environment Debugging
+
+### Check Python Environment
+
+```bash
+# Check Python version
+python --version
+
+# Check pip version
+pip --version
+
+# Check installed packages
+pip list | grep -E "(pandas|numpy|matplotlib)"
+
+# Check package version compatibility
+pip check
+```
+
+### Virtual Environment Debugging
+
+```bash
+# Check if in virtual environment
+echo $VIRTUAL_ENV
+
+# Create new virtual environment if needed
+python -m venv tutorial-env
+source tutorial-env/bin/activate  # Linux/macOS
+# or tutorial-env\Scripts\activate  # Windows
+
+# Install dependencies
+pip install pandas numpy matplotlib seaborn scikit-learn
+```
+
 ## Debugging Best Practices
 
 ### 1. Systematic Debugging
@@ -304,6 +341,41 @@ def process_data(data, threshold=0.5):
     if not 0 <= threshold <= 1:
         raise ValueError("threshold must be between 0-1")
     # Processing logic...
+```
+
+## Tool-Specific Debugging
+
+### Pantheon-CLI Tutorial Tool
+
+**Remember**: Pantheon-CLI is a tutorial tool that:
+- Has only one command: `pantheon-cli --version`
+- Provides a web terminal environment for learning
+- All data analysis happens within the terminal environment using standard Python, R, and shell commands
+
+**Common Misconceptions**:
+```bash
+# Wrong: These commands don't exist
+pantheon analyze data.csv     # Doesn't exist
+pantheon config show         # Doesn't exist
+
+# Correct: Use standard commands within the terminal environment
+python -c "import pandas; print(pandas.__version__)"
+python analyze_data.py
+R --version
+```
+
+### Tutorial Environment Specific Issues
+
+```bash
+# Check Python in tutorial environment
+which python
+python --version
+
+# Check available data files
+ls -la *.csv *.txt *.json
+
+# Test basic functionality
+python -c "print('Hello, Pantheon-CLI tutorial!')"
 ```
 
 Through systematic debugging methods, you can quickly locate and resolve issues, improving learning efficiency.

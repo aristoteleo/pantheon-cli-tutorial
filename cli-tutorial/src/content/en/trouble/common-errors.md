@@ -1,295 +1,359 @@
 # Common Errors
 
-This page lists the most common errors encountered when using Pantheon-CLI and their solutions.
+This page lists the most common errors encountered when using the Pantheon-CLI tutorial tool and their solutions.
 
 ## Installation Errors
 
-### Error: Command 'pantheon' not found
+### Error: Python Version Incompatible
 ```bash
-bash: pantheon: command not found
+ERROR: Package 'pantheon-cli' requires Python '>=3.8' but the running Python is 3.7.x
 ```
-
-**Cause**: Pantheon-CLI is not properly installed or PATH is not configured
 
 **Solution**:
 ```bash
-# Check if installed
-pip show pantheon-cli
+# Check Python version
+python --version
+python3 --version
 
-# Reinstall
-pip install --force-reinstall pantheon-cli
+# Install Python 3.8+
+# Ubuntu/Debian
+sudo apt update && sudo apt install python3.8
 
-# Add to PATH
-export PATH="$HOME/.local/bin:$PATH"
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+# macOS (using Homebrew)
+brew install python@3.8
+
+# Windows: Download and install from python.org
 ```
 
-### Error: Permission denied
+### Error: pip Installation Failed
+```bash
+ERROR: Could not find a version that satisfies the requirement pantheon-cli
+```
+
+**Solution**:
+```bash
+# Upgrade pip
+pip install --upgrade pip
+
+# Use Python 3's pip
+pip3 install pantheon-cli
+
+# User-level installation
+pip install --user pantheon-cli
+
+# If network issues, use China mirror
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple pantheon-cli
+```
+
+### Error: Permission Denied
 ```bash
 Permission denied: '/usr/local/bin/pantheon'
 ```
 
 **Solution**:
 ```bash
-# Use user-level installation
+# Method 1: User-level installation (recommended)
 pip install --user pantheon-cli
 
-# Or fix permissions
-sudo chmod +x /usr/local/bin/pantheon
+# Add user bin directory to PATH
+export PATH="$HOME/.local/bin:$PATH"
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+
+# Method 2: Use sudo (not recommended)
+sudo pip install pantheon-cli
 ```
 
-## Data Loading Errors
+## Runtime Errors
 
-### Error: Unable to read file
-```
-DataError: Unable to read file 'data.csv'
-```
-
-**Possible causes**:
-1. File does not exist
-2. Insufficient file permissions
-3. File encoding issues
-
-**Solution**:
+### Error: Command Not Found
 ```bash
-# Check if file exists
-pantheon test -f data.csv
-
-# Check permissions
-ls -la data.csv
-
-# Specify encoding
-pantheon load data.csv --encoding utf-8
-pantheon load data.csv --encoding gbk  # Chinese Windows files
-```
-
-### Error: Out of memory
-```
-MemoryError: Unable to allocate array with shape (1000000, 100)
-```
-
-**Solution**:
-```python
-# Read large files in chunks
-pantheon load data.csv --chunks 10000
-
-# Or use streaming processing
-pantheon stream data.csv | pantheon analyze
-```
-
-## Analysis Errors
-
-### Error: Column name does not exist
-```
-KeyError: 'column_name'
+bash: pantheon-cli: command not found
 ```
 
 **Solution**:
 ```bash
-# View all column names
-pantheon columns data.csv
+# Check if installed
+pip show pantheon-cli
 
-# Rename columns
-pantheon rename-columns data.csv --map "old:new"
+# Check installation location
+which pantheon-cli
+whereis pantheon-cli
 
-# Ignore missing columns
-pantheon analyze data.csv --ignore-missing
+# Add to PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# Or run directly
+python -m pantheon_cli --version
 ```
 
-### Error: Data type mismatch
-```
-TypeError: unsupported operand type(s) for +: 'str' and 'int'
-```
-
-**Solution**:
-```python
-# Check data types
-pantheon dtypes data.csv
-
-# Convert data types
-pantheon convert data.csv --column age --to int
-pantheon convert data.csv --column date --to datetime
-```
-
-## Visualization Errors
-
-### Error: Unable to display plot
-```
-RuntimeError: Unable to display plot
-```
-
-**Possible causes**:
-1. No graphical interface (SSH connection)
-2. Missing display drivers
-
-**Solution**:
+### Error: Module Import Failed
 ```bash
-# Save instead of display
-pantheon plot data.csv --save output.png
-
-# Use text mode
-pantheon plot data.csv --ascii
-
-# Export as HTML
-pantheon plot data.csv --html report.html
-```
-
-## Network Errors
-
-### Error: Connection timeout
-```
-ConnectionTimeout: Request timed out
-```
-
-**Solution**:
-```bash
-# Increase timeout
-pantheon config set timeout 60
-
-# Use proxy
-export HTTP_PROXY=http://proxy.example.com:8080
-export HTTPS_PROXY=http://proxy.example.com:8080
-
-# Offline mode
-pantheon --offline analyze data.csv
-```
-
-## Python Environment Errors
-
-### Error: Module not found
-```
 ModuleNotFoundError: No module named 'pandas'
 ```
 
 **Solution**:
 ```bash
 # Install missing dependencies
-pantheon deps install
+pip install pandas numpy matplotlib seaborn
 
-# Or manually install
-pip install pandas numpy matplotlib
+# Install bioinformatics packages
+pip install scanpy anndata biopython
 
-# Use virtual environment
+# Batch install (if requirements.txt exists)
+pip install -r requirements.txt
+
+# Create virtual environment (recommended)
 python -m venv pantheon-env
-source pantheon-env/bin/activate
+source pantheon-env/bin/activate  # Linux/macOS
+# or pantheon-env\Scripts\activate  # Windows
 pip install pantheon-cli
 ```
 
-### Error: Version conflicts
-```
-ERROR: pip's dependency resolver does not currently take into account all the packages that are installed
+## Tutorial Environment Errors
+
+### Error: Terminal Unresponsive
+```bash
+# Terminal in browser stops responding
 ```
 
 **Solution**:
 ```bash
-# Create clean virtual environment
-python -m venv clean-env
-source clean-env/bin/activate
-pip install pantheon-cli
-
-# Or use conda
-conda create -n pantheon python=3.11
-conda activate pantheon
-pip install pantheon-cli
+# 1. Open browser developer tools (F12) to check errors
+# 2. Refresh page
+#    Ctrl+F5 (Windows/Linux) or Cmd+Shift+R (macOS)
+# 3. Clear browser cache
+# 4. Restart browser
+# 5. Test simple commands
+echo "Test terminal response"
 ```
 
-## Configuration Errors
-
-### Error: Corrupted configuration file
-```
-ConfigError: Invalid configuration file
+### Error: Python Packages Unavailable
+```bash
+ImportError: No module named 'pandas'
+# In tutorial environment
 ```
 
 **Solution**:
 ```bash
-# Reset configuration
-pantheon config reset
+# Check Python in tutorial environment
+python --version
+python -c "import sys; print(sys.executable)"
 
-# Validate configuration
-pantheon config validate
+# Check installed packages
+python -c "import pandas, numpy, matplotlib; print('Basic packages available')"
 
-# Backup and rebuild
-mv ~/.pantheon/config.yaml ~/.pantheon/config.yaml.bak
-pantheon config init
+# If packages are missing, this may be a tutorial environment limitation
+# Contact tutorial provider or check documentation
+```
+
+### Error: File Access Issues
+```bash
+FileNotFoundError: [Errno 2] No such file or directory: 'data.csv'
+```
+
+**Solution**:
+```bash
+# Check current directory
+pwd
+
+# List available files
+ls -la
+
+# Use tutorial-provided sample data
+ls *.csv *.txt *.json
+
+# Or create sample data for practice
+python -c "
+import pandas as pd
+import numpy as np
+data = pd.DataFrame({'x': np.random.randn(100), 'y': np.random.randn(100)})
+data.to_csv('sample_data.csv', index=False)
+print('Created sample data file: sample_data.csv')
+"
+```
+
+## Common Misconception Errors
+
+### Error: Using Non-existent Commands
+```bash
+# Incorrect attempts
+pantheon analyze data.csv
+pantheon config show
+pantheon models list
+```
+
+**Solution**:
+**Remember**: Pantheon-CLI has only one command: `pantheon-cli --version`
+```bash
+# Correct approach: Use standard commands in the tutorial terminal environment
+# Python data analysis
+python -c "import pandas as pd; df = pd.read_csv('data.csv'); print(df.head())"
+python analyze_script.py
+
+# R language analysis
+R --version
+Rscript analysis.R
+
+# Shell commands
+ls -la
+cat data.csv | head -5
+
+# Check Pantheon-CLI version (the only dedicated command)
+pantheon-cli --version
+```
+
+### Error: Expecting AI Auto-analysis Features
+```bash
+# Expected but non-existent functionality
+pantheon "analyze my sales data and generate insights"
+```
+
+**Solution**:
+Pantheon-CLI is a **tutorial tool**, not an AI analysis tool:
+```bash
+# Use standard data analysis methods
+# Practice these skills in the tutorial terminal environment
+
+# Python data analysis example
+python -c "
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Read data
+data = pd.read_csv('sales_data.csv')
+
+# Basic statistics
+print(data.describe())
+
+# Simple visualization
+data.plot(kind='hist')
+plt.savefig('sales_histogram.png')
+print('Chart saved as sales_histogram.png')
+"
 ```
 
 ## Performance Issues
 
-### Issue: Slow execution
+### Issue: Tutorial Environment Running Slowly
 **Diagnosis**:
 ```bash
-# View performance metrics
-pantheon benchmark
-
-# Monitor resource usage
-pantheon monitor
+# Check browser performance
+# 1. Close unnecessary tabs
+# 2. Check browser memory usage (Task Manager)
+# 3. Clear browser cache
 ```
 
-**Optimization solutions**:
+**Optimization**:
+```python
+# Optimize performance in code
+import pandas as pd
+
+# Use efficient data types
+df = df.astype({'int_col': 'int32', 'float_col': 'float32'})
+
+# Avoid loops, use vectorized operations
+df['new_col'] = df['col1'] * df['col2']  # Efficient
+# Avoid: for i in range(len(df)): ...    # Inefficient
+
+# Release memory promptly
+import gc
+del large_dataframe
+gc.collect()
+```
+
+### Issue: Browser Out of Memory
 ```bash
-# Enable parallel processing
-pantheon config set parallel true
-pantheon config set workers 4
-
-# Use caching
-pantheon config set cache true
-
-# Optimize data loading
-pantheon optimize data.csv
-```
-
-## Encoding Issues
-
-### Error: UnicodeDecodeError
-```
-UnicodeDecodeError: 'utf-8' codec can't decode byte
+# Browser shows "Page Unresponsive" or crashes
 ```
 
 **Solution**:
 ```bash
-# Detect file encoding
-pantheon detect-encoding file.csv
-
-# Convert encoding
-iconv -f GBK -t UTF-8 input.csv > output.csv
-
-# Force encoding
-pantheon load file.csv --encoding latin1
+# 1. Restart browser
+# 2. Increase virtual memory (Windows)
+# 3. Use smaller datasets for practice
+# 4. Process data in batches
 ```
 
-## Quick Diagnostic Commands
+```python
+# Process data in batches in Python
+import pandas as pd
 
-When encountering problems, run the following diagnostic commands:
+# Read large files in chunks
+chunk_size = 1000
+for chunk in pd.read_csv('large_file.csv', chunksize=chunk_size):
+    # Process each chunk
+    result = chunk.groupby('category').mean()
+    print(f"Processed {len(chunk)} rows of data")
+```
 
+## Learning-Related Errors
+
+### Error: Expecting Overly Complex Features
 ```bash
-# Complete system diagnosis
-pantheon doctor --full
-
-# Check specific components
-pantheon doctor --check python
-pantheon doctor --check dependencies
-pantheon doctor --check network
-
-# Generate diagnostic report
-pantheon diagnostic-report > report.txt
+# Attempting too advanced analysis
+# "Execute deep learning neural network training"
 ```
+
+**Solution**:
+Pantheon-CLI tutorial focuses on basic learning:
+```python
+# Start with basics
+# 1. Data loading and exploration
+import pandas as pd
+data = pd.read_csv('data.csv')
+print(data.info())
+
+# 2. Basic statistical analysis
+print(data.describe())
+
+# 3. Simple visualization
+import matplotlib.pyplot as plt
+data.hist()
+plt.savefig('data_overview.png')
+
+# 4. Basic machine learning (if environment supports)
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+# etc...
+```
+
+### Error: Misunderstanding Tutorial Purpose
+**Problem**: Mistaking Pantheon-CLI for a production analysis tool
+
+**Clarification**:
+Pantheon-CLI is an **educational tool** designed for:
+1. **Learning data analysis concepts** - Understanding concepts through hands-on practice
+2. **Practicing programming skills** - Python, R, shell commands
+3. **Simulating real environments** - Safe experimentation environment
+4. **Building foundations** - Preparation for real projects
 
 ## Getting Help
 
-If the problem is still unresolved:
+### How to Report Issues Effectively
 
-1. **View detailed error information**
-   ```bash
-   pantheon --verbose --debug your-command
-   ```
+```bash
+# Collect diagnostic information
+echo "=== System Information ==="
+uname -a
+echo "=== Python Version ==="
+python --version
+echo "=== Pantheon-CLI Version ==="
+pantheon-cli --version 2>&1 || echo "pantheon-cli not installed"
+echo "=== Browser Information ==="
+# In browser console run: navigator.userAgent
+```
 
-2. **Search known issues**
-   - [GitHub Issues](https://github.com/pantheon-cli/pantheon-cli/issues)
-   - [Community Forum](https://community.pantheon-cli.io)
+### Issue Reports Should Include:
+1. **Complete error messages** - Don't truncate partial information
+2. **Reproduction steps** - Detailed operational steps
+3. **Environment information** - OS, browser, Python version
+4. **Expected results** - What you expected to happen
+5. **Actual results** - What actually happened
 
-3. **Submit issue report**
-   ```bash
-   pantheon report-issue --auto
-   ```
+### Help Channels:
+1. **View documentation** - Carefully read tutorials and FAQ
+2. **GitHub Issues** - Search for similar problems
+3. **Community forums** - Discuss with other learners
+4. **Stack Overflow** - Use relevant tags
 
-Remember: Most errors have simple solutions, don't get discouraged!
+Remember: Detailed and accurate problem descriptions are key to getting effective help!

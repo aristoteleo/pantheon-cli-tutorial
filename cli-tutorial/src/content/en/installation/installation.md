@@ -9,7 +9,7 @@ Unlike competing products like Claude Code and Gemini-CLI, **Pantheon-CLI depend
 This design enables you to:
 - **Complete local processing**: All data analysis is performed on your machine
 - **Seamless Python ecosystem integration**: Direct use of pandas, numpy, matplotlib and other libraries
-- **Hybrid programming**: Perfect combination of natural language and code
+- **Mixed programming**: Perfect combination of natural language and code
 - **High-performance computing**: Full utilization of local hardware resources
 
 ## Quick Installation (Recommended Path)

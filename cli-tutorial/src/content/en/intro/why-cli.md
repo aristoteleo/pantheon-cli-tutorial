@@ -6,7 +6,7 @@ Pantheon-CLI redefines the paradigm of data analysis, fundamentally changing how
 
 ### Tool Fragmentation
 - **Traditional approach**: Need to switch between multiple tools, passing data through file save/load operations
-- **Pantheon-CLI**: Implements a hybrid programming environment with variable persistence, where Python/R/Julia variables are directly shared without file intermediates
+- **Pantheon-CLI**: Implements a Mixed programming environment with variable persistence, where Python/R/Julia variables are directly shared without file intermediates
 
 ### High Technical Barriers
 - **Traditional approach**: Requires mastery of multiple programming languages and complex tool chains, manual environment dependency management
@@ -22,7 +22,7 @@ Pantheon-CLI redefines the paradigm of data analysis, fundamentally changing how
 
 ## Core Advantages
 
-### Hybrid Programming Experience
+### Mixed Programming Experience
 - Variable persistence technology with Python/R/Julia variables directly shared in memory
 - Breaks through traditional CLI file save/load limitations, enabling seamless language switching
 - Natural language-driven intelligent programming that fluidly transforms thoughts into code execution

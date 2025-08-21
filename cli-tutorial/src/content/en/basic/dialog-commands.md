@@ -7,7 +7,7 @@ Pantheon-CLI's core advantage lies in its natural language dialog capabilities, 
 ### 1.1 Natural Language Description
 Directly describe the analysis you want to perform in English or Chinese, and Pantheon-CLI will intelligently understand and execute.
 
-### 1.2 Hybrid Programming Mode
+### 1.2 Mixed Programming Mode
 Freely switch between natural language, Python, R, Julia, and other programming languages within the same session.
 
 ### 1.3 Intelligent Context Understanding
