@@ -116,8 +116,22 @@ const expandedSections = reactive({})
 const loadNavigation = async () => {
   try {
     const response = await fetch('/navigation.yaml')
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
+    
     const yamlText = await response.text()
+    
+    if (!yamlText.trim()) {
+      throw new Error('Empty navigation.yaml file')
+    }
+    
     const config = yaml.load(yamlText)
+    
+    if (!config || !config.navigation) {
+      throw new Error('Invalid navigation config structure')
+    }
     
     menuItems.value = config.navigation
     
@@ -125,6 +139,27 @@ const loadNavigation = async () => {
     updateExpandedSections()
   } catch (error) {
     console.error('Failed to load navigation config:', error)
+    
+    // Fallback navigation structure
+    menuItems.value = [
+      {
+        key: 'introduction',
+        children: [
+          { path: '/', key: 'introOverview' },
+          { path: '/intro/what-is-cli', key: 'introWhatIs' },
+          { path: '/intro/why-cli', key: 'introWhy' },
+          { path: '/intro/getting-started', key: 'introGettingStarted' }
+        ]
+      },
+      {
+        key: 'installation',
+        children: [
+          { path: '/installation', key: 'installOverview' }
+        ]
+      }
+    ]
+    
+    updateExpandedSections()
   }
 }
 
