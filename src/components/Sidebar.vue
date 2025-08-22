@@ -3,7 +3,7 @@
     <!-- Logo区域 -->
     <div class="logo-section">
       <div class="logo-icon">
-        <img src="/pantheon.png" alt="Pantheon-CLI" />
+        <img :src="logoUrl" alt="Pantheon-CLI" />
       </div>
       <div class="logo-text">Pantheon-CLI</div>
     </div>
@@ -95,7 +95,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
 import { useThemeStore } from '../stores/theme'
@@ -113,9 +113,14 @@ const { isDark } = storeToRefs(themeStore)
 const menuItems = ref([])
 const expandedSections = reactive({})
 
+// 动态计算logo URL，基于当前的base路径
+const logoUrl = computed(() => {
+  return import.meta.env.BASE_URL + 'pantheon.png'
+})
+
 const loadNavigation = async () => {
   try {
-    const response = await fetch('/navigation.yaml')
+    const response = await fetch(import.meta.env.BASE_URL + 'navigation.yaml')
     
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`)
