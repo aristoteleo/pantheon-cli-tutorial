@@ -29,7 +29,7 @@
           <div class="output-block" v-if="block.type === 'output'">
             <pre class="output-text" :class="{ 'long-box': isLongBox(block.content) }">{{ truncateIfNeeded(block.content) }}</pre>
             <div v-if="block.content.split('\n').length > 30" class="truncate-hint">
-              <span class="hint-text">内容过长已截断显示</span>
+              <span class="hint-text">Content too long, truncated</span>
             </div>
           </div>
           

@@ -11,17 +11,17 @@ Based on real session recordings, users employed the following key instruction s
 
 **1. Random Number Generation**:
 ```
-生成10个随机数
+generate 10 random number
 ```
 
 **2. Repeated Verification**:
 ```
-生成10个随机数
+generate 10 random number
 ```
 
 **3. Statistical Calculation**:
 ```
-显示均值和标准差
+show me the mean and std
 ```
 
 This complete user input sequence demonstrates Pantheon CLI's powerful capability for **Chinese natural language programming**: accomplishing complex programming tasks through everyday language, including a complete data science workflow of data generation, session state maintenance, and statistical analysis.
@@ -32,7 +32,7 @@ This complete user input sequence demonstrates Pantheon CLI's powerful capabilit
 
 #### User Instruction
 ```
-生成10个随机数
+generate 10 random number
 ```
 
 #### System Executed Code
@@ -62,7 +62,7 @@ The user requested the same operation again, and the system demonstrated consist
 
 #### User Instruction
 ```
-生成10个随机数
+generate 10 random number
 ```
 
 #### System Executed Code
@@ -88,7 +88,7 @@ The user requested more advanced data analysis, and the system demonstrated unde
 
 #### User Instruction
 ```
-显示均值和标准差
+show me the mean and std
 ```
 
 #### System Executed Code
