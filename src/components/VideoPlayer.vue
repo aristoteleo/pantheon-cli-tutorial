@@ -44,8 +44,8 @@ const route = useRoute()
 
 // 真实案例的YouTube视频映射
 const videoMapping = {
-  // '/cases/social-behavior': 'VIDEO_ID_HERE',
-  // '/cases/customs-finance': 'VIDEO_ID_HERE', 
+  '/cases/social-behavior': '_TgCyOksU8I',
+  '/cases/customs-finance': 'QEEWFQiUAoQ', 
   // '/cases/scrna-complex': 'VIDEO_ID_HERE',
   // '/cases/scllm': 'VIDEO_ID_HERE',
   // '/cases/hd-10x': 'VIDEO_ID_HERE',
@@ -156,5 +156,49 @@ const videoId = computed(() => {
 
 .info-icon {
   font-size: 16px;
+}
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  .video-player {
+    padding: 15px;
+  }
+  
+  .video-header h3 {
+    font-size: 16px;
+  }
+  
+  .video-subtitle {
+    font-size: 13px;
+  }
+  
+  .video-container {
+    min-height: 250px;
+  }
+  
+  .video-placeholder {
+    min-height: 250px;
+  }
+  
+  .placeholder-content {
+    max-width: 250px;
+    padding: 0 15px;
+  }
+  
+  .video-icon {
+    font-size: 36px;
+  }
+  
+  .placeholder-content h4 {
+    font-size: 16px;
+  }
+  
+  .placeholder-desc {
+    font-size: 13px;
+  }
+  
+  .info-item {
+    font-size: 13px;
+  }
 }
 </style>

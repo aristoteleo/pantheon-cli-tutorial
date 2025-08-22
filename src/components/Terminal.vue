@@ -623,4 +623,54 @@ const truncateIfNeeded = (content) => {
   margin: 0;
   padding: 10px;
 }
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  .terminal-header {
+    padding: 6px 10px;
+  }
+  
+  .terminal-tab {
+    padding: 3px 8px;
+    font-size: 12px;
+    gap: 4px;
+  }
+  
+  .action-btn {
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+  
+  .terminal-content {
+    padding: 15px;
+    font-size: 13px;
+  }
+  
+  .command-text {
+    font-size: 13px;
+  }
+  
+  .output-text {
+    font-size: 12px;
+  }
+  
+  .output-text.long-box {
+    font-size: 10px;
+    max-height: 300px;
+    padding: 6px;
+  }
+  
+  .comment-text {
+    font-size: 12px;
+  }
+  
+  .default-content {
+    font-size: 12px;
+    padding: 8px;
+  }
+  
+  .welcome-message {
+    padding: 20px 15px;
+  }
+}
 </style>

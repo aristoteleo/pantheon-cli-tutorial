@@ -258,6 +258,8 @@ const changeLocale = () => {
   left: 0;
   top: 0;
   overflow-y: auto;
+  transition: transform 0.3s ease;
+  z-index: 1000;
 }
 
 .logo-section {
@@ -548,5 +550,16 @@ const changeLocale = () => {
 
 .sidebar::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
+}
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
 }
 </style>

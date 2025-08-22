@@ -233,4 +233,59 @@ function escapeHtml(text) {
   color: var(--text-secondary);
   font-style: italic;
 }
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  .tutorial-content {
+    padding: 15px;
+    height: auto;
+    overflow-y: visible;
+    min-height: auto;
+  }
+  
+  .markdown-body {
+    padding-bottom: 30px;
+  }
+  
+  :deep(.markdown-body h1) {
+    font-size: 22px;
+    margin: 15px 0 12px;
+  }
+  
+  :deep(.markdown-body h2) {
+    font-size: 18px;
+    margin: 15px 0 10px;
+  }
+  
+  :deep(.markdown-body h3) {
+    font-size: 16px;
+    margin: 12px 0 8px;
+  }
+  
+  :deep(.markdown-body p) {
+    margin: 8px 0;
+    font-size: 14px;
+  }
+  
+  :deep(.markdown-body ul),
+  :deep(.markdown-body ol) {
+    padding-left: 20px;
+    font-size: 14px;
+  }
+  
+  :deep(.markdown-body code) {
+    font-size: 13px;
+    padding: 1px 4px;
+  }
+  
+  :deep(.markdown-body pre) {
+    padding: 12px;
+    margin: 12px 0;
+    overflow-x: auto;
+  }
+  
+  :deep(.markdown-body pre code) {
+    font-size: 12px;
+  }
+}
 </style>

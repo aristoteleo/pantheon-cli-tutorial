@@ -97,4 +97,43 @@ const shouldShowTerminal = computed(() => {
   height: 100%;
   overflow: hidden;
 }
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  .tutorial-view {
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 60px); /* Account for hamburger menu space */
+  }
+  
+  .content-section {
+    flex: none;
+    min-width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    overflow-y: visible;
+  }
+  
+  .content-section.full-width {
+    min-height: calc(100vh - 60px);
+    border-bottom: none;
+  }
+  
+  .right-panel-section {
+    flex: none;
+    min-width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 300px;
+    max-height: 50vh;
+  }
+  
+  .terminal-wrapper {
+    padding: 15px;
+    height: 100%;
+  }
+}
 </style>
