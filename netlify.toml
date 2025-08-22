@@ -3,7 +3,7 @@
   command = "pnpm install --frozen-lockfile && pnpm run build"
   
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "18"
   PNPM_VERSION = "8"
 
 # SPA redirect - must come AFTER static file rules

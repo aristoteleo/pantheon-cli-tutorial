@@ -55,6 +55,8 @@ navigation:
   
   - key: realCases
     children:
+      - path: /cases/seurat-llm-annotation
+        key: caseSeuratLlmAnnotation
       - path: /cases/social-behavior
         key: caseSocialBehavior
       - path: /cases/customs-finance
@@ -73,8 +75,6 @@ navigation:
         key: caseMolecularDocking
       - path: /cases/mixed-python-r
         key: caseMixedPythonR
-      - path: /cases/seurat-llm-annotation
-        key: caseSeuratLlmAnnotation
   
   - key: troubleshooting
     children:

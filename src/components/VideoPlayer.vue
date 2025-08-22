@@ -42,7 +42,7 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-// 真实案例的YouTube视频映射 - 暂时为空，等待实际视频ID
+// 真实案例的YouTube视频映射
 const videoMapping = {
   // '/cases/social-behavior': 'VIDEO_ID_HERE',
   // '/cases/customs-finance': 'VIDEO_ID_HERE', 
@@ -53,7 +53,7 @@ const videoMapping = {
   // '/cases/rna-upstream': 'VIDEO_ID_HERE',
   // '/cases/molecular-docking': 'VIDEO_ID_HERE',
   // '/cases/mixed-python-r': 'VIDEO_ID_HERE',
-  // '/cases/seurat-llm-annotation': 'VIDEO_ID_HERE',
+  '/cases/seurat-llm-annotation': 'z407b912IWo',
 }
 
 const videoId = computed(() => {
