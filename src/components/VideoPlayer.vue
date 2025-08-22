@@ -46,12 +46,12 @@ const route = useRoute()
 const videoMapping = {
   '/cases/social-behavior': '_TgCyOksU8I',
   '/cases/customs-finance': 'QEEWFQiUAoQ', 
-  // '/cases/scrna-complex': 'VIDEO_ID_HERE',
-  // '/cases/scllm': 'VIDEO_ID_HERE',
-  // '/cases/hd-10x': 'VIDEO_ID_HERE',
+  '/cases/scrna-complex': 'Ox4xePjcDiE',
+  '/cases/scllm': 'g0bcBLEIc14',
+  '/cases/hd-10x': 'BHXXVa77ylY',
   // '/cases/atac-upstream': 'VIDEO_ID_HERE',
-  // '/cases/rna-upstream': 'VIDEO_ID_HERE',
-  // '/cases/molecular-docking': 'VIDEO_ID_HERE',
+  '/cases/rna-upstream': '3mUh7hfW3wA',
+  '/cases/molecular-docking': 'eIfD1HySKgE',
   // '/cases/mixed-python-r': 'VIDEO_ID_HERE',
   '/cases/seurat-llm-annotation': 'z407b912IWo',
 }
