@@ -28,6 +28,8 @@ navigation:
         key: installModelConfig
       - path: /installation/knowledge-base
         key: installKnowledgeBase
+      - path: /installation/pantheon-notebook
+        key: installPantheonNotebook
       - path: /installation/verify
         key: installVerify
   

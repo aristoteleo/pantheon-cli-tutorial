@@ -34,6 +34,7 @@ const contentMap = {
   '/installation/detail/linux': 'installation/linux',
   '/installation/model-config': 'installation/model-config',
   '/installation/knowledge-base': 'installation/knowledge-base',
+  '/installation/pantheon-notebook': 'installation/pantheon-notebook',
   '/installation/verify': 'installation/verify',
   
   '/basic-commands': 'basic/basic-commands',

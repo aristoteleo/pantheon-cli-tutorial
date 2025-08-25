@@ -49,7 +49,7 @@ const videoMapping = {
   '/cases/scrna-complex': 'Ox4xePjcDiE',
   '/cases/scllm': 'g0bcBLEIc14',
   '/cases/hd-10x': 'BHXXVa77ylY',
-  // '/cases/atac-upstream': 'VIDEO_ID_HERE',
+  '/cases/atac-upstream': 'MBCQciQrB_0',
   '/cases/rna-upstream': '3mUh7hfW3wA',
   '/cases/molecular-docking': 'eIfD1HySKgE',
   // '/cases/mixed-python-r': 'VIDEO_ID_HERE',
